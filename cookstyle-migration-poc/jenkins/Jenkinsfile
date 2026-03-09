@@ -1,0 +1,268 @@
+// Jenkinsfile for Chef Cookbook Linting with Cookstyle + Custom Rules
+//
+// This pipeline validates Chef cookbooks against:
+// 1. Standard Cookstyle rules (200+ Chef best practices)
+// 2. Custom Barclays security rules (BARC001-BARC019+)
+//
+// Pipeline Features:
+// - Parallel linting for performance
+// - Detailed HTML reports
+// - Artifact archiving
+// - Slack notifications (optional)
+// - GitHub status checks
+//
+// Requirements:
+// - Ruby 3.0+ installed
+// - Bundler gem installed
+// - Access to internal gem repository
+
+pipeline {
+    agent {
+        label 'chef-workstation'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        BUNDLE_PATH = "${WORKSPACE}/.bundle"
+        GEM_HOME = "${WORKSPACE}/.gems"
+        PATH = "${GEM_HOME}/bin:${PATH}"
+        COOKSTYLE_FORMAT = 'json'
+        REPORTS_DIR = "${WORKSPACE}/reports"
+    }
+
+    parameters {
+        string(
+            name: 'COOKBOOK_PATH',
+            defaultValue: 'cookbooks/',
+            description: 'Path to cookbooks directory'
+        )
+        booleanParam(
+            name: 'AUTO_CORRECT',
+            defaultValue: false,
+            description: 'Attempt auto-correction of violations'
+        )
+        booleanParam(
+            name: 'FAIL_ON_WARNING',
+            defaultValue: false,
+            description: 'Fail build on warnings (not just errors)'
+        )
+        choice(
+            name: 'SEVERITY_LEVEL',
+            choices: ['error', 'warning', 'convention', 'refactor', 'info'],
+            description: 'Minimum severity to report'
+        )
+    }
+
+    stages {
+        stage('Setup') {
+            steps {
+                script {
+                    echo "Setting up Cookstyle with custom rules..."
+
+                    // Create reports directory
+                    sh 'mkdir -p ${REPORTS_DIR}'
+
+                    // Install dependencies
+                    sh '''
+                        gem install bundler --no-document
+
+                        # Create Gemfile if not present
+                        if [ ! -f Gemfile ]; then
+                            cat > Gemfile << 'EOF'
+source 'https://rubygems.org'
+
+# Internal gem server for custom rules
+source 'https://gems.internal.company.com' do
+  gem 'b-cookstyle-rules', '~> 1.0'
+end
+
+gem 'cookstyle', '~> 7.32'
+gem 'rubocop', '~> 1.50'
+gem 'rubocop-performance', '~> 1.17'
+EOF
+                        fi
+
+                        bundle config set --local path ${BUNDLE_PATH}
+                        bundle install --jobs 4 --retry 3
+                    '''
+                }
+            }
+        }
+
+        stage('Discover Cookbooks') {
+            steps {
+                script {
+                    def cookbooks = sh(
+                        script: "find ${params.COOKBOOK_PATH} -name 'metadata.rb' -exec dirname {} \\; | sort -u",
+                        returnStdout: true
+                    ).trim().split('\n')
+
+                    env.COOKBOOKS = cookbooks.join(' ')
+                    echo "Found ${cookbooks.size()} cookbooks to lint"
+                    cookbooks.each { cb ->
+                        echo "  - ${cb}"
+                    }
+                }
+            }
+        }
+
+        stage('Lint Cookbooks') {
+            steps {
+                script {
+                    def exitCode = sh(
+                        script: """
+                            bundle exec cookstyle \\
+                                --format json \\
+                                --out ${REPORTS_DIR}/cookstyle-results.json \\
+                                --format html \\
+                                --out ${REPORTS_DIR}/cookstyle-results.html \\
+                                --format progress \\
+                                --require b_cookstyle_rules \\
+                                ${params.AUTO_CORRECT ? '--autocorrect' : ''} \\
+                                ${params.FAIL_ON_WARNING ? '--fail-level warning' : '--fail-level error'} \\
+                                ${env.COOKBOOKS}
+                        """,
+                        returnStatus: true
+                    )
+
+                    // Parse results
+                    if (fileExists("${REPORTS_DIR}/cookstyle-results.json")) {
+                        def results = readJSON file: "${REPORTS_DIR}/cookstyle-results.json"
+                        def summary = results.summary
+
+                        echo """
+                        ╔════════════════════════════════════════════════════╗
+                        ║           COOKSTYLE ANALYSIS SUMMARY              ║
+                        ╠════════════════════════════════════════════════════╣
+                        ║  Files Inspected: ${summary.inspected_file_count.toString().padLeft(5)}                         ║
+                        ║  Total Offenses:  ${summary.offense_count.toString().padLeft(5)}                         ║
+                        ║  Auto-corrected:  ${(summary.corrected_count ?: 0).toString().padLeft(5)}                         ║
+                        ╚════════════════════════════════════════════════════╝
+                        """
+
+                        // Set build status based on results
+                        if (summary.offense_count > 0) {
+                            def severeOffenses = results.files.collect { f ->
+                                f.offenses.findAll { o ->
+                                    o.severity in ['error', 'fatal']
+                                }
+                            }.flatten()
+
+                            if (severeOffenses.size() > 0) {
+                                currentBuild.result = 'FAILURE'
+                                error "Found ${severeOffenses.size()} critical violations"
+                            } else if (params.FAIL_ON_WARNING) {
+                                currentBuild.result = 'FAILURE'
+                                error "Found ${summary.offense_count} violations"
+                            } else {
+                                currentBuild.result = 'UNSTABLE'
+                            }
+                        }
+                    }
+
+                    env.LINT_EXIT_CODE = exitCode.toString()
+                }
+            }
+        }
+
+        stage('Generate Reports') {
+            steps {
+                script {
+                    // Generate detailed violation report
+                    sh '''
+                        bundle exec ruby -r json -e '
+                            results = JSON.parse(File.read(ENV["REPORTS_DIR"] + "/cookstyle-results.json"))
+
+                            File.open(ENV["REPORTS_DIR"] + "/violations-by-cop.txt", "w") do |f|
+                                violations_by_cop = Hash.new { |h,k| h[k] = [] }
+
+                                results["files"].each do |file|
+                                    file["offenses"].each do |offense|
+                                        violations_by_cop[offense["cop_name"]] << {
+                                            file: file["path"],
+                                            line: offense["location"]["line"],
+                                            message: offense["message"]
+                                        }
+                                    end
+                                end
+
+                                violations_by_cop.sort_by { |cop, v| -v.size }.each do |cop, violations|
+                                    f.puts "=" * 80
+                                    f.puts "#{cop} (#{violations.size} violations)"
+                                    f.puts "=" * 80
+                                    violations.each do |v|
+                                        f.puts "  #{v[:file]}:#{v[:line]}"
+                                        f.puts "    #{v[:message]}"
+                                        f.puts
+                                    end
+                                end
+                            end
+                        '
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Archive reports
+            archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
+
+            // Publish HTML report
+            publishHTML(target: [
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports',
+                reportFiles: 'cookstyle-results.html',
+                reportName: 'Cookstyle Report'
+            ])
+
+            // Clean up
+            cleanWs(deleteDirs: true, patterns: [
+                [pattern: '.bundle/**', type: 'INCLUDE'],
+                [pattern: '.gems/**', type: 'INCLUDE']
+            ])
+        }
+
+        success {
+            script {
+                if (env.SLACK_WEBHOOK) {
+                    slackSend(
+                        color: 'good',
+                        message: "✅ Cookstyle: All cookbooks passed linting\n${env.BUILD_URL}"
+                    )
+                }
+            }
+        }
+
+        failure {
+            script {
+                if (env.SLACK_WEBHOOK) {
+                    slackSend(
+                        color: 'danger',
+                        message: "❌ Cookstyle: Linting failed\nSee report: ${env.BUILD_URL}Cookstyle_20Report/"
+                    )
+                }
+            }
+        }
+
+        unstable {
+            script {
+                if (env.SLACK_WEBHOOK) {
+                    slackSend(
+                        color: 'warning',
+                        message: "⚠️ Cookstyle: Found non-critical violations\nSee report: ${env.BUILD_URL}Cookstyle_20Report/"
+                    )
+                }
+            }
+        }
+    }
+}

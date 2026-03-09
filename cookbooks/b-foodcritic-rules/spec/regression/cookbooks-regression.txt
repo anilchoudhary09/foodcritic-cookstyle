@@ -1,0 +1,2 @@
+https://stash.barcapint.com:8443/scm/is_chef/b-foodcritic-regression.git|20ec697e829b4b6f551d7fae2c282f8374350c0b|b-foodcritic-regression
+https://stash.barcapint.com:8443/scm/is_chef/mw_foodcritic_test.git|2b6e956799c8d37371448e039d5e5a409436c0c3|mw_foodcritic_test

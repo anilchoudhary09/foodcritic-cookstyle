@@ -1,0 +1,238 @@
+require 'English'
+require 'parser/current'
+require 'erb'
+
+$stdout.sync = true
+
+task default: %i[rubocop readme_update_all test]
+
+begin
+  desc 'Ruby code style check - Rubocop'
+  task :rubocop do
+    puts 'Checking Foodcritic rules.rb with Rubocop'
+    sh 'rubocop --cache false -c .rubocop.yml rules.rb'
+  end
+rescue
+  puts 'No rubocop available'
+end
+
+begin
+  desc 'Regression tests - RSpec'
+  task :test do
+    puts 'Executing regression tests for Foodcritic rules'
+    output = `chef exec rspec`.split("\n")
+    # lame-o-filter
+    puts (output - output.grep(/^[[:space:]]*expected: |^[[:space:]]*got: /)).join("\n")
+    abort 'Regression tests for Foodcritic rules failed' unless $CHILD_STATUS.success?
+  end
+rescue LoadError
+  puts 'No rspec available'
+end
+
+desc 'Execute regression tests from Jenkins CI'
+task jenkins_regression: %i[build_cause git_merge git_diff changed_files rubocop readme_update_all test]
+
+desc 'Abort if CI build cause is not COMMITHOOKCAUSE'
+task :build_cause do
+  puts 'Checking Jenkins CI build cause...'
+  abort 'Build cause is not COMMITHOOKCAUSE' if ENV['BUILD_CAUSE'] != 'COMMITHOOKCAUSE'
+end
+
+desc 'Check if changed files are from whitelist'
+task :changed_files do
+  puts 'Changed file check in pull request'
+  whitelist_files = ['README.md',
+                     'rules.rb',
+                     '.rubocop_todo.yml',
+                     'Rakefile',
+                     'community_cookbook.json',
+                     'spec/regression_helpers.rb',
+                     'spec/regression/regression_spec.rb',
+                     'spec/regression/cookbooks-regression.txt',
+                     'spec/regression/cookbooks-violator.txt',
+                     'spec/regression/expected-output-regression.txt',
+                     'spec/regression/expected-output-violator.txt']
+  changed_files = `git diff --name-only b-foodcritic-rules/#{ENV['GIT_TARGET_BRANCH']} #{ENV['GIT_TARGET_BRANCH']}`.split("\n")
+  abort 'Failed to get changed files' unless $CHILD_STATUS.success?
+  diff = changed_files - whitelist_files
+  unless diff.empty?
+    puts "Changed files not included in whitelist:\n#{diff.join("\n")}"
+    abort 'Some changed files are not in whitelist'
+  end
+end
+
+desc 'Merge current checkout foodcritic_ci branch to target branch'
+task :git_merge do
+  puts "Merge current checkout foodcritic_ci branch to target #{ENV['GIT_TARGET_BRANCH']} branch"
+  sh "git checkout #{ENV['GIT_TARGET_BRANCH']} && git merge foodcritic_ci --no-ff -m 'Automated merge'"
+end
+
+desc 'Output diff between current checkout foodcritic_ci branch and target branch'
+task :git_diff do
+  puts "Output diff between current checkout foodcritic_ci branch and #{ENV['GIT_TARGET_BRANCH']} branch"
+  sh "git diff --no-color b-foodcritic-rules/#{ENV['GIT_TARGET_BRANCH']} #{ENV['GIT_TARGET_BRANCH']}"
+end
+
+desc 'Update README and abort if changes need to be committed'
+task :readme_update_all do
+  puts 'Checking if README.md file needs updating'
+  Rake::Task['readme_update_barc027'].invoke
+  Rake::Task['readme_update_barc028'].invoke
+  Rake::Task['readme_update_barc030'].invoke
+  Rake::Task['readme_update_barc032'].invoke
+  Rake::Task['readme_update_barc033'].invoke
+  readme_status = `git status README.md --porcelain`.chomp
+  unless readme_status.eql?('') || !$CHILD_STATUS.success?
+    puts 'README.md contains uncommitted changes'
+    puts 'please run `rake readme_update_all`, review README.md changes and commit them'
+    abort
+  end
+  puts 'README.md: no changes needed'
+end
+
+desc 'Update BARC027 README section'
+task :readme_update_barc027 do
+  template = ERB.new(erb_table_0, nil, '-')
+  header_marker = '**The tables below list the current BARC027 constraints:**'
+  footer_marker = '**end of BARC027 tables**'
+  header = ['Restricted Middleware software packages', '']
+  body = Hash[foodcritic_whitelist('mw_pkg_prefixes').collect { |i| [i, ''] }]
+  table_result = template.result(binding)
+  template = ERB.new(erb_table_0, nil, '-')
+  header = ['Approved Middleware cookbooks which can deploy Middleware software', '']
+  body = Hash[foodcritic_whitelist('mw_cookbook_whitelist').collect { |i| [i, ''] }]
+  table_result = table_result + "\n\n" + template.result(binding)
+  overwrite_readme(header_marker, footer_marker, table_result)
+end
+
+desc 'Update BARC028 README section'
+task :readme_update_barc028 do
+  template = ERB.new(erb_table_2, nil, '-')
+  header_marker = '**The table below lists the current BARC028 constraints:**'
+  footer_marker = '**end of BARC028 table**'
+  header = ['Cookbook', 'Allowed contingent cookbooks']
+  body = foodcritic_whitelist('restricted_cookbook_whitelist')
+  table_result = template.result(binding)
+  overwrite_readme(header_marker, footer_marker, table_result)
+end
+
+desc 'Update BARC030 README section'
+task :readme_update_barc030 do
+  template = ERB.new(erb_table_3, nil, '-')
+  header_marker = '**The table below lists the current BARC030 constraints:**'
+  footer_marker = '**end of BARC030 table**'
+  header = ['Deprecated', 'Migration Path', 'Notes']
+  body = foodcritic_whitelist('deprecated_cookbooks')
+  table_result = template.result(binding)
+  overwrite_readme(header_marker, footer_marker, table_result)
+end
+
+desc 'Update BARC032 README section'
+task :readme_update_barc032 do
+  template = ERB.new(erb_table_1, nil, '-')
+  header_marker = '**The table below lists the current BARC032 constraints:**'
+  footer_marker = '**end of BARC032 table**'
+  header = ['Cookbook', 'Minimum Version']
+  body = foodcritic_whitelist('cookbook_minimum_versions')
+  table_result = template.result(binding)
+  overwrite_readme(header_marker, footer_marker, table_result)
+end
+
+desc 'Update BARC033 README section'
+task :readme_update_barc033 do
+  template = ERB.new(erb_table_2, nil, '-')
+  header_marker = '**The table below lists the current BARC033 constraints:**'
+  footer_marker = '**end of BARC033 table**'
+  header = ['Cookbook', 'Pin requirements with priority']
+  body = foodcritic_whitelist('cookbook_allowed_pins_only')
+  table_result = template.result(binding)
+  overwrite_readme(header_marker, footer_marker, table_result)
+end
+
+def foodcritic_whitelist(whitelist_var)
+  foodcritic_rules = './rules.rb'
+  code = File.read(foodcritic_rules)
+  source_buffer = Parser::Source::Buffer.new(foodcritic_rules, 1)
+  source_buffer.source = code
+  builder = Parser::Builders::Default.new
+  parser = Parser::CurrentRuby.new(builder)
+  parser.diagnostics.all_errors_are_fatal = true
+  parser.diagnostics.ignore_warnings = true
+  ast, _comments = parser.parse_with_comments(source_buffer)
+  found = false
+  ast.children.each do |item|
+    next unless item.type == :ivasgn && item.children[0] == :"@#{whitelist_var}"
+    eval(item.location.expression.source) # rubocop:disable Security/Eval
+    found = true
+    break
+  end
+  return eval "@#{whitelist_var}" if found
+  puts "Failed to evaluate @#{whitelist_var} variable in rules.rb"
+  abort
+end
+
+def erb_table_0
+<<-'EOH'
+
+<%= header.first %> | 
+---- | <%= -%>
+<% body.keys.sort.each do |key| %>
+<%= key -%> | <%= -%>
+<% end %>
+
+EOH
+end
+
+def erb_table_1
+<<-'EOH'
+
+<%= header.map { |entry| entry }.join(' | ') %>
+<%= header.map { |entry| '----' }.join(' | ') -%>
+<% body.keys.sort.each do |key| %>
+<%= key %> | <%= body[key] -%>
+<% end %>
+
+EOH
+end
+
+def erb_table_2
+<<-'EOH'
+
+<%= header.map { |entry| entry }.join(' | ') %>
+<%= header.map { |entry| '----' }.join(' | ') -%>
+<% body.keys.sort.each do |key| %>
+<%= key %> | <%= body[key].join(', ') -%>
+<% end %>
+
+EOH
+end
+
+def erb_table_3
+<<-'EOH'
+
+<%= header.map { |entry| entry }.join(' | ') %>
+<%= header.map { |entry| '----' }.join(' | ') -%>
+<% body.keys.sort.each do |key| %>
+<%= key %> | <%= body[key][0] %> | <%= body[key][1] -%>
+<% end %>
+
+EOH
+end
+
+def overwrite_readme(header, footer, content)
+  # find header/footer position in README.md and replace with content string
+  file = 'README.md'
+  lines = File.readlines(file)
+  start_line = 0
+  end_line = 0
+  lines.each_with_index do |line, lineno|
+    start_line = lineno if line.start_with?(header)
+    end_line = lineno if line.start_with?(footer)
+  end
+  abort "Failed to find start marker: #{header}" if start_line.eql?(0)
+  abort "Failed to find end marker: #{footer}" if end_line.eql?(0)
+  newlines = lines[0..start_line]
+  newlines += [content]
+  newlines += lines[end_line..-1]
+  File.open(file, 'w') { |file| file.write(newlines.join) }
+end

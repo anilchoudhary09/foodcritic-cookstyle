@@ -1,0 +1,29 @@
+# Auto-generated todo file for gradual migration
+# These rules are temporarily relaxed
+
+Layout/LineLength:
+  Max: 300
+
+Naming/FileName:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Layout/MultilineOperationIndentation:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Max: 25
+
+Metrics/PerceivedComplexity:
+  Max: 30
+
+Metrics/AbcSize:
+  Max: 40
+
+Metrics/MethodLength:
+  Max: 60
+
+Metrics/BlockLength:
+  Max: 100

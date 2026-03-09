@@ -1,0 +1,24 @@
+# Service Whitelist Configuration
+---
+global:
+  - httpd
+  - nginx
+  - tomcat
+
+per_cookbook:
+  b-platform-security:
+    - auditd
+    - rsyslog
+    - chronyd
+    - ntpd
+    - sssd
+  b-sshd:
+    - sshd
+  b-crowdstrike:
+    - falcon-sensor
+  b-splunk:
+    - splunk
+    - splunkforwarder
+  b-firewall:
+    - firewalld
+    - iptables

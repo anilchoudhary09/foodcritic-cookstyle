@@ -1,0 +1,1 @@
+https://stash.barcapint.com:8443/scm/is_chef/b-foodcritic-violator.git|83be99793736096da054d910f63525f4a33931ed|b-foodcritic-violator

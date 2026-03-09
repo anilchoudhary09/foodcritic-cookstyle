@@ -1,0 +1,547 @@
+BARC001: Do not manipulate users locally, use Active Directory instead: ./barcmw-pkgbase-httpd/recipes/echannels.rb:41
+BARC001: Do not manipulate users locally, use Active Directory instead: ./chef-openshift3_enterprise/recipes/master_cluster.rb:238
+BARC001: Do not manipulate users locally, use Active Directory instead: ./emesplunk-infra/recipes/splunk_user.rb:6
+BARC001: Do not manipulate users locally, use Active Directory instead: ./haproxy/recipes/install_source.rb:80
+BARC001: Do not manipulate users locally, use Active Directory instead: ./pcb-paymentssanctions-fircosoft-tomcat/recipes/kitchen.rb:17
+BARC001: Do not manipulate users locally, use Active Directory instead: ./pcb-paymentssanctions-fircosoft-tomcat/recipes/kitchen.rb:6
+BARC001: Do not manipulate users locally, use Active Directory instead: ./tomcat-examples/recipes/kitchen.rb:14
+BARC001: Do not manipulate users locally, use Active Directory instead: ./tomcat-examples/recipes/kitchen.rb:25
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./barcmw-pkgbase-httpd/recipes/echannels.rb:35
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./emesplunk-infra/recipes/splunk_user.rb:1
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./emesplunk-infra/recipes/splunk_user.rb:12
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./pcb-paymentssanctions-fircosoft-tomcat/recipes/kitchen.rb:1
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./pcb-paymentssanctions-fircosoft-tomcat/recipes/kitchen.rb:12
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./tomcat-examples/recipes/kitchen.rb:20
+BARC002: Do not manipulate groups locally, use Active Directory instead: ./tomcat-examples/recipes/kitchen.rb:9
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./ark/providers/default.rb:79
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-openshift3_enterprise/recipes/before.rb:24
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-openshift3_enterprise/recipes/before.rb:30
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-servicewatch-discovery/recipes/sudoers.rb:18
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-servicewatch-discovery/recipes/sudoers.rb:27
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-servicewatch-discovery/recipes/sudoers.rb:66
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-servicewatch-discovery/recipes/users_allow.rb:40
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-servicewatch-discovery/recipes/users_allow.rb:46
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./b-ui-hadoop/recipes/krb5-cloudera.rb:26
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./check_mk-agent/recipes/default.rb:105
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./check_mk-agent/recipes/delete.rb:29
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./chef-openshift3_enterprise/recipes/common.rb:23
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./chef-openshift3_enterprise/recipes/master_cluster.rb:186
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./chef-openshift3_enterprise/recipes/master_standalone.rb:24
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./chef-openshift3_enterprise/recipes/node.rb:61
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./fircosoft-screening-env/recipes/default.rb:43
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./gradle/recipes/default.rb:20
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./httpd/libraries/httpd_service_rhel_systemd.rb:28
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./httpd/libraries/httpd_service_rhel_systemd.rb:38
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./httpd/libraries/httpd_service_rhel_sysvinit.rb:22
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./ilmt-agent/recipes/install.rb:102
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./ilmt-agent/recipes/install.rb:111
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./infra-chef-app-deployment/recipes/default.rb:58
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./infra-chef-app-deployment/recipes/default.rb:66
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./java/recipes/set_java_home.rb:26
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./java/recipes/set_java_home.rb:30
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./os2aws-bridge-chef/recipes/memcached.rb:1
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./packagecloud/providers/repo.rb:94
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./packagecloud/providers/repo.rb:99
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./sysctl/recipes/service.rb:20
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./systemd/recipes/udev.rb:21
+BARC005: Do not manipulate any existing file or directory in the blacklist: ./ulimit/recipes/default.rb:12
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: b-appdynamics/attributes/machine_agent.rb:11
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: b-ntp/attributes/default.rb:39
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: b-ntp/attributes/default.rb:40
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: b-ui-hadoop/attributes/defaults.rb:25
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: chef-openshift3_enterprise/attributes/default.rb:93
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: chef-openshift3_enterprise/attributes/default.rb:94
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: chef-openshift3_enterprise/attributes/default.rb:95
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: chef-openshift3_enterprise/attributes/default.rb:96
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: client-rb/attributes/default.rb:4
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: sysctl/attributes/default.rb:23
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: sysctl/attributes/default.rb:26
+BARC005a: Do not use attributes to manipulate any existing file or directory in the blacklist: ulimit/attributes/default.rb:3
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/boolean.rb:23
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/fcontext.rb:13
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/fcontext.rb:23
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/fcontext.rb:31
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/fcontext.rb:39
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/permissive.rb:12
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/permissive.rb:21
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/port.rb:22
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/port.rb:33
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/port.rb:43
+BARC007: Do not manipulate SELinux: ./selinux_policy/providers/port.rb:52
+BARC008: Do not kill or change the priority of a process: ./b-mlocate/recipes/default.rb:26
+BARC008: Do not kill or change the priority of a process: ./cpu/providers/nice.rb:22
+BARC011: Do not remove files/directories, or convert and copy a file: ./b-openshift3_enterprise/recipes/after.rb:42
+BARC011: Do not remove files/directories, or convert and copy a file: ./os2aws-bridge-chef/recipes/memcached.rb:13
+BARC012: Do not manipulate operating system kernel: ./sysctl/providers/param.rb:20
+BARC012: Do not manipulate operating system kernel: ./systemd/libraries/provider_systemd_modules.rb:55
+BARC012: Do not manipulate operating system kernel: ./systemd/libraries/provider_systemd_modules.rb:71
+BARC012: Do not manipulate operating system kernel: ./systemd/libraries/provider_systemd_sysctl.rb:42
+BARC013: Do not manipulate volumes, partitions, and devices of the file system: ./bc-devops-elk-dev-elk/recipes/mount.rb:7
+BARC015: Do not manipulate root cron jobs: ./b-mlocate/recipes/default.rb:26
+BARC015: Do not manipulate root cron jobs: ./barcmw-pkgbase/recipes/apache_tomcat.rb:53
+BARC016: Do not use service or yum command, use the corresponding chef resource instead: ./b-nexus/recipes/install.rb:130
+BARC016: Do not use service or yum command, use the corresponding chef resource instead: ./packagecloud/providers/repo.rb:116
+BARC017: Do not manipulate system services: ./b-galaxy/recipes/aixgalaxy.rb:48
+BARC017: Do not manipulate system services: ./b-galaxy/recipes/linuxgalaxy.rb:38
+BARC018: Please review this service: ./b-appdynamics/recipes/machine_agent.rb:76
+BARC018: Please review this service: ./b-nexus/recipes/install.rb:130
+BARC018: Please review this service: ./b-rabbitmq/recipes/default.rb:33
+BARC018: Please review this service: ./check_mk-agent/recipes/default.rb:118
+BARC018: Please review this service: ./check_mk-agent/recipes/delete.rb:34
+BARC018: Please review this service: ./chef-openshift3_enterprise/recipes/common.rb:63
+BARC018: Please review this service: ./chef-openshift3_enterprise/recipes/master_cluster.rb:234
+BARC018: Please review this service: ./cloud-web/recipes/apache_install.rb:16
+BARC018: Please review this service: ./cloud-web/recipes/apache_install.rb:5
+BARC018: Please review this service: ./httpd/libraries/httpd_service_rhel_systemd.rb:79
+BARC018: Please review this service: ./httpd/libraries/httpd_service_rhel_sysvinit.rb:70
+BARC018: Please review this service: ./ilmt-agent/recipes/install.rb:142
+BARC021: Please specify the exact version in cookbook dependency: ./apaas-client/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./appdynamics-bc-env/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./b-appdynamics/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./b-elk/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./b-flyway/metadata.rb:12
+BARC021: Please specify the exact version in cookbook dependency: ./b-gradle/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./b-gradle/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./b-java/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./b-local_accounts/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./b-maven/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./b-maven/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./b-monitoring/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./b-ntp/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./b-rhel7-build/metadata.rb:13
+BARC021: Please specify the exact version in cookbook dependency: ./b-rhel7-build/metadata.rb:14
+BARC021: Please specify the exact version in cookbook dependency: ./b-rhel7-build/metadata.rb:15
+BARC021: Please specify the exact version in cookbook dependency: ./b-rhel7-build/metadata.rb:16
+BARC021: Please specify the exact version in cookbook dependency: ./b-rhel7-build/metadata.rb:17
+BARC021: Please specify the exact version in cookbook dependency: ./b-rhel7-build/metadata.rb:18
+BARC021: Please specify the exact version in cookbook dependency: ./b-ui-hadoop/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./b-ui-hadoop/metadata.rb:12
+BARC021: Please specify the exact version in cookbook dependency: ./b-ui-hadoop/metadata.rb:13
+BARC021: Please specify the exact version in cookbook dependency: ./b-ui-hadoop/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./b-ui-hadoop/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./b-users_manage/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./b-users_manage/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./b-vas_manage/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./b-vas_manage/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./barclays-security-audit-aix/metadata.rb:17
+BARC021: Please specify the exact version in cookbook dependency: ./barclays-security-audit-rhel/metadata.rb:17
+BARC021: Please specify the exact version in cookbook dependency: ./barcmw-jboss/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./barcmw-jboss/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./barcmw-pkgbase/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./barcmw-pkgbase/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./barcmw-pkgbase/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./elk-bc-env/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./elk-ib-env/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./fircosoft-screening-env/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./gradle/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./gradle/metadata.rb:12
+BARC021: Please specify the exact version in cookbook dependency: ./haproxy/metadata.rb:16
+BARC021: Please specify the exact version in cookbook dependency: ./haproxy/metadata.rb:17
+BARC021: Please specify the exact version in cookbook dependency: ./httpd/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./is_iaas_chefpipeline_kitchen/metadata.rb:15
+BARC021: Please specify the exact version in cookbook dependency: ./jenkins-bc-bukt/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./jenkins-bc-bukt/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./jenkins-bc-env/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./jenkins-bc-env/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./jenkins-bc-env/metadata.rb:8
+BARC021: Please specify the exact version in cookbook dependency: ./jenkins-bc-env/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./maven/metadata.rb:10
+BARC021: Please specify the exact version in cookbook dependency: ./maven/metadata.rb:11
+BARC021: Please specify the exact version in cookbook dependency: ./maven/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./pc-bc-egress/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./pc-bc-ingress/metadata.rb:9
+BARC021: Please specify the exact version in cookbook dependency: ./sysctl/metadata.rb:19
+BARC021: Please specify the exact version in cookbook dependency: ./tomcat-examples/metadata.rb:9
+BARC022: Do not force chef-client exit, this stops other recipes: ./ark/libraries/tar_command_builder.rb:37
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-elk/recipes/default.rb:17
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-multipath-grub-fix/recipes/default.rb:20
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-nexus/libraries/nexus_helper.rb:251
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-nolio/definitions/agent_installer.rb:75
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-nolio/definitions/agent_installer.rb:84
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-nolio/definitions/agent_installer.rb:92
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:158
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:178
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:193
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:214
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:233
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:42
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/cluster.rb:65
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/user.rb:111
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/user.rb:127
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/user.rb:142
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/user.rb:154
+BARC022: Do not force chef-client exit, this stops other recipes: ./b-rabbitmq/providers/user.rb:83
+BARC022: Do not force chef-client exit, this stops other recipes: ./b_iac_cc_test/libraries/wrapper.rb:28
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:103
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:105
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:12
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:188
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:204
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:214
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:217
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/common.rb:33
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/domain.rb:15
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/domain.rb:16
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/domain.rb:17
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/domain.rb:20
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/libraries/domain.rb:49
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:100
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:128
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:24
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:26
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:42
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:61
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:72
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:77
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/default.rb:78
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/domain.rb:117
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/domain.rb:135
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/domain_cluster.rb:27
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/providers/domain_credentials.rb:121
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-jboss/recipes/default.rb:9
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/chef_vault.rb:5
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/default.rb:5
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/rhel6_jwstomcat7.rb:6
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/rhel6_jwstomcat7.rb:9
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/rhel6_tomcat6.rb:11
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/rhel6_tomcat6.rb:7
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/rhel7_tomcat7.rb:6
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/rhel7_tomcat7.rb:9
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase-tomcat/recipes/selinux.rb:3
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-pkgbase/recipes/chef_vault.rb:6
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-tomcat/libraries/chef_vault.rb:29
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-tomcat/libraries/chef_vault.rb:32
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-tomcat/libraries/common.rb:132
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-tomcat/libraries/common.rb:136
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-tomcat/libraries/common.rb:4
+BARC022: Do not force chef-client exit, this stops other recipes: ./barcmw-tomcat/libraries/common.rb:40
+BARC022: Do not force chef-client exit, this stops other recipes: ./bc-devops-elk-dev-elk/recipes/decision.rb:17
+BARC022: Do not force chef-client exit, this stops other recipes: ./build-essential/libraries/xcode_command_line_tools.rb:117
+BARC022: Do not force chef-client exit, this stops other recipes: ./build-essential/recipes/_solaris2.rb:40
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-openshift3_enterprise/recipes/etcd_cluster.rb:91
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-openshift3_enterprise/recipes/master.rb:51
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-openshift3_enterprise/recipes/master.rb:55
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-server-ingredient/libraries/helpers.rb:98
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-vault/libraries/chef_vault_secret.rb:68
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-vault/libraries/chef_vault_secret.rb:70
+BARC022: Do not force chef-client exit, this stops other recipes: ./chef-vault/libraries/helpers.rb:41
+BARC022: Do not force chef-client exit, this stops other recipes: ./compat_resource/libraries/autoload.rb:11
+BARC022: Do not force chef-client exit, this stops other recipes: ./compat_resource/libraries/autoload.rb:7
+BARC022: Do not force chef-client exit, this stops other recipes: ./compat_resource/metadata.rb:9
+BARC022: Do not force chef-client exit, this stops other recipes: ./haproxy/libraries/default.rb:39
+BARC022: Do not force chef-client exit, this stops other recipes: ./haproxy/recipes/install_source.rb:58
+BARC022: Do not force chef-client exit, this stops other recipes: ./haproxy/resources/default.rb:9
+BARC022: Do not force chef-client exit, this stops other recipes: ./hostsfile/libraries/entry.rb:114
+BARC022: Do not force chef-client exit, this stops other recipes: ./hostsfile/libraries/entry.rb:48
+BARC022: Do not force chef-client exit, this stops other recipes: ./hostsfile/libraries/entry.rb:51
+BARC022: Do not force chef-client exit, this stops other recipes: ./hostsfile/libraries/manipulator.rb:41
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/alternatives.rb:44
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/alternatives.rb:59
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/ark.rb:150
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/ark.rb:157
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/ark.rb:164
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/ark.rb:172
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/providers/ark.rb:85
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/recipes/default.rb:23
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/recipes/ibm.rb:26
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/recipes/ibm_tar.rb:25
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/recipes/ibm_tar.rb:29
+BARC022: Do not force chef-client exit, this stops other recipes: ./java/recipes/oracle.rb:48
+BARC022: Do not force chef-client exit, this stops other recipes: ./omnibus_updater/libraries/omnitrucker.rb:36
+BARC022: Do not force chef-client exit, this stops other recipes: ./omnibus_updater/libraries/omnitrucker.rb:82
+BARC022: Do not force chef-client exit, this stops other recipes: ./omnibus_updater/recipes/installer.rb:34
+BARC022: Do not force chef-client exit, this stops other recipes: ./omnibus_updater/recipes/installer.rb:53
+BARC022: Do not force chef-client exit, this stops other recipes: ./packagecloud/libraries/helper.rb:20
+BARC022: Do not force chef-client exit, this stops other recipes: ./packagecloud/libraries/helper.rb:39
+BARC022: Do not force chef-client exit, this stops other recipes: ./packagecloud/providers/repo.rb:16
+BARC022: Do not force chef-client exit, this stops other recipes: ./packagecloud/providers/repo.rb:201
+BARC022: Do not force chef-client exit, this stops other recipes: ./selinux_policy/recipes/install.rb:11
+BARC022: Do not force chef-client exit, this stops other recipes: ./selinux_policy/recipes/install.rb:24
+BARC022: Do not force chef-client exit, this stops other recipes: ./selinux_policy/recipes/install.rb:27
+BARC022: Do not force chef-client exit, this stops other recipes: ./supermarket-omnibus-cookbook/recipes/default.rb:25
+BARC022: Do not force chef-client exit, this stops other recipes: ./sysctl/libraries/sysctl.rb:26
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/feature_base.rb:37
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/feature_base.rb:41
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/feature_base.rb:45
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/feature_base.rb:49
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/feature_base.rb:53
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/registry_helper.rb:66
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/version.rb:136
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_architecture_helper.rb:37
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_architecture_helper.rb:56
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_architecture_helper.rb:72
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_helper.rb:94
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_package.rb:181
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_privileged.rb:48
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_privileged.rb:58
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_privileged.rb:67
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/libraries/windows_privileged.rb:73
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/providers/feature_dism.rb:39
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/providers/task.rb:112
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/providers/task.rb:127
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/providers/task.rb:233
+BARC022: Do not force chef-client exit, this stops other recipes: ./windows/providers/task.rb:239
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./appdynamics-bc-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-aix-pkg/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-appdynamics/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-auth/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-build-compliance/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-chef-client-wrapper/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-chef-logstash/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-cloudsite-lb/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-cloudsite-web/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-cloudsite/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-elk/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-gradle/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-helloworld/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-identification/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-initial-bootstrap/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-java/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-jenkins-rolb/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-jenkins/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-maven/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-mlocate/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-monitoring/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-multipath-grub-fix/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-nexus/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-nolio/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-omnibus_updater/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-openshift3_enterprise/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-oracleclient/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-pc-base/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-rhel7-build/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-servicewatch-discovery/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./b-ui-hadoop/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./barclays-base/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./barclays-incident-fixes/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./barclays-security-audit-aix/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./barcmw-compliance/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./barcmw-gem/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./barcmw-javaremediation/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./bc-applepay-elk-prod-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./bc-devops-elk-dev-elk/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./bc-gtl-elk-prod-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./check_mk-agent/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./chef-vault/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./chef_handler/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./client-rb/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./cloud-web/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./compat_resource/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./cto-iaas-aws-nameservice/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./elk-bc-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./elk-ib-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./emesplunk-infra/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./fircosoft-screening-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./fnet-b-elk-wp/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./ilmt-agent/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./infra-chef-app-deployment/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./is_cloud_auto_microservice/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./is_cloud_auto_microsite/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./jenkins-bc-bukt/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./jenkins-bc-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./nolio-pcb-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./ohai/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./omnibus_updater/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./os2aws-bridge-chef/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./os2aws-nameservice-chef/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./pc-bc-app-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./pc-bc-app/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./pc-bc-egress-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./pc-bc-egress/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./pc-bc-ingress-env/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./pc-bc-ingress/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./san-multipath-check/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./test/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./ulimit/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./wps_copy_config/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./wps_nolio_agent/metadata.rb:1
+BARC023: Please specify the cookbook supported platform by providing supports setting in the metadata: ./wps_splunk_forwarder/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./apaas-client/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./appdynamics-bc-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./ark/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-aix-pkg/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-appdynamics/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-auth/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-auth/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-build-compliance/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-build-compliance/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-chef-client-wrapper/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-chef-logstash/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-cloudsite-lb/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-cloudsite-web/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-cloudsite/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-elk/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-erlang/metadata.rb:18
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-flyway/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-galaxy/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-gradle/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-helloworld/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-identification/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-identification/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-initial-bootstrap/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-java/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-java/metadata.rb:3
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-jenkins-rolb/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-jenkins/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-local_accounts/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-local_accounts/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-maven/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-mlocate/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-monitoring/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-monitoring/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-mono-deploy/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-mono/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-multipath-grub-fix/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-nexus/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-nolio/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-ntp/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-omnibus_updater/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-openshift3_enterprise/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-oracleclient/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-pc-base/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-rabbitmq/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-rhel7-build/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-rhel7-build/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-servicewatch-discovery/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-ui-hadoop/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-users_manage/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-users_manage/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-vas_manage/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b-vas_manage/metadata.rb:2
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./b_win_all_platformrevision/metadata.rb:11
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barclays-base/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barclays-incident-fixes/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barclays-security-audit-aix/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barclays-security-audit-rhel/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-compliance/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-compliance/metadata.rb:3
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-gem/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-httpd/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-javaremediation/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-javaremediation/metadata.rb:3
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-jboss/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-pkgbase-httpd/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-pkgbase-tomcat/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-pkgbase/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./barcmw-tomcat/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./bc-applepay-elk-prod-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./bc-devops-elk-dev-elk/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./bc-gtl-elk-prod-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./check_mk-agent/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./chef-vault/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./chef_handler/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./client-rb/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./cloud-web/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./cpu/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./cto-iaas-aws-nameservice/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./elk-bc-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./elk-ib-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./emesplunk-infra/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./fircosoft-screening-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./fnet-b-elk-wp/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./gradle/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./haproxy/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./ilmt-agent/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./iptables/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./is_cloud_auto_microservice/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./is_cloud_auto_microsite/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./java/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./jboss-pcb-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./jenkins-bc-bukt/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./jenkins-bc-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./logrotate/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./nolio-pcb-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./ohai/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./omnibus_updater/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./os2aws-bridge-chef/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./os2aws-nameservice-chef/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-app-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-app/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-egress-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-egress/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-ingress-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-ingress/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-web-env/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-web/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pc-bc-web/metadata.rb:3
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./pcb-paymentssanctions-fircosoft-tomcat/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./revproxy-ecommerce/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./san-multipath-check/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./selinux_policy/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./seven_zip/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./sysctl/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./test/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./tomcat-examples/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./ulimit/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./wps_copy_config/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./wps_nolio_agent/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./wps_splunk_forwarder/metadata.rb:1
+BARC024: Please specify valid maintainer, maintainer_email and source_url in the metadata: ./wps_weblogic/metadata.rb:1
+BARC025: Unauthorised usage of node tags detected: ./b-rabbitmq/recipes/user_management.rb:31
+BARC026: Cookbook uses node.save to save partial node data to the chef-server mid-run: ./barcmw-jboss/libraries/common.rb:135
+BARC026: Cookbook uses node.save to save partial node data to the chef-server mid-run: ./barcmw-jboss/libraries/domain.rb:160
+BARC026: Cookbook uses node.save to save partial node data to the chef-server mid-run: ./barcmw-jboss/recipes/default.rb:14
+BARC026: Cookbook uses node.save to save partial node data to the chef-server mid-run: ./is-mw-jboss6-build/libraries/common.rb:148
+BARC026: Cookbook uses node.save to save partial node data to the chef-server mid-run: ./is-mw-jboss6-build/libraries/domain.rb:175
+BARC026: Cookbook uses node.save to save partial node data to the chef-server mid-run: ./is-mw-jboss6-build/recipes/default.rb:17
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./b-cloudsite/recipes/webserver.rb:19
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-httpd/recipes/default.rb:49
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-httpd/recipes/default.rb:55
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-httpd/recipes/echannels.rb:54
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-httpd/recipes/ecommerce.rb:17
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-tomcat/recipes/rhel6_jwstomcat7.rb:14
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-tomcat/recipes/rhel6_tomcat6.rb:48
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase-tomcat/recipes/rhel7_tomcat7.rb:15
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./barcmw-pkgbase/recipes/apache_tomcat.rb:27
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./cloud-web/recipes/apache_install.rb:1
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:103
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:108
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:11
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:114
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:120
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:126
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:133
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:140
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:147
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:152
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:155
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:158
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:16
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:161
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:22
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:28
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:34
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:41
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:48
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:5
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:55
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:60
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:63
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:66
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:69
+BARC027: Only approved cookbooks can deploy Middleware owned software: ./mw_foodcritic_test/recipes/BARC027.rb:97
+BARC030: Cookbook depends on a deprecated cookbook: ./b-java/metadata.rb:8
+BARC030: Cookbook depends on a deprecated cookbook: ./b-maven/metadata.rb:9
+BARC030: Cookbook depends on a deprecated cookbook: ./b-pc-base/metadata.rb:9
+BARC030: Cookbook depends on a deprecated cookbook: ./b-ui-hadoop/metadata.rb:8
+BARC030: Cookbook depends on a deprecated cookbook: ./b-ui-hadoop/metadata.rb:9
+BARC030: Cookbook depends on a deprecated cookbook: ./bc-applepay-elk-prod-env/metadata.rb:11
+BARC030: Cookbook depends on a deprecated cookbook: ./bc-devops-elk-dev-elk/metadata.rb:11
+BARC030: Cookbook depends on a deprecated cookbook: ./bc-gtl-elk-prod-env/metadata.rb:11
+BARC030: Cookbook depends on a deprecated cookbook: ./gradle/metadata.rb:11
+BARC030: Cookbook depends on a deprecated cookbook: ./is_cloud_auto_microservice/metadata.rb:8
+BARC030: Cookbook depends on a deprecated cookbook: ./jenkins-bc-bukt/metadata.rb:10
+BARC030: Cookbook depends on a deprecated cookbook: ./maven/metadata.rb:10
+BARC031: Cookbook uses controlled packages: ./b-java/recipes/jdk8.rb:5
+BARC031: Cookbook uses controlled packages: ./b-jenkins-rolb/recipes/default.rb:27
+BARC031: Cookbook uses controlled packages: ./b-pc-base/recipes/jre7.rb:9
+BARC031: Cookbook uses controlled packages: ./pcb-paymentssanctions-fircosoft-tomcat/recipes/default-tm.rb:7
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/advanced.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/basic.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/clientcert.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/customjar.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/customkeystore.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/gitdeploy.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/jwstomcat7.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/securitymanager.rb:8
+BARC031: Cookbook uses controlled packages: ./tomcat-examples/recipes/tcmanager.rb:8

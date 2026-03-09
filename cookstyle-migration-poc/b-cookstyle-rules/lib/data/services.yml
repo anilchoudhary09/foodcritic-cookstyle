@@ -1,0 +1,80 @@
+# Service Whitelist Configuration
+# Defines which services can be managed by which cookbooks
+---
+# Services that are globally allowed (any cookbook can manage)
+global:
+  # Application-level services
+  - httpd
+  - nginx
+  - tomcat
+  - java
+  - node
+  - python
+
+# Per-cookbook service permissions
+per_cookbook:
+  b-platform-security:
+    - auditd
+    - rsyslog
+    - syslog
+    - chronyd
+    - ntpd
+    - sssd
+    - polkitd
+    - systemd-journald
+
+  b-sshd:
+    - sshd
+    - ssh
+
+  b-crowdstrike:
+    - falcon-sensor
+    - crowdstrike
+
+  b-qualys:
+    - qualys
+    - qualys-agent
+
+  b-tanium:
+    - tanium
+    - tanium-client
+
+  b-splunk:
+    - splunk
+    - splunkforwarder
+    - splunkd
+
+  b-firewall:
+    - firewalld
+    - iptables
+    - ip6tables
+
+  b-selinux:
+    - selinux
+
+  b-chef-client:
+    - chef-client
+
+  b-puppet-agent:
+    - puppet
+    - puppet-agent
+
+  b-prometheus:
+    - prometheus
+    - node_exporter
+    - alertmanager
+
+  b-nagios:
+    - nagios
+    - nrpe
+
+  b-zabbix:
+    - zabbix-agent
+    - zabbix-agent2
+
+  b-ossec:
+    - ossec
+    - ossec-hids
+
+  b-aide:
+    - aide

@@ -1,0 +1,88 @@
+# /etc Path Whitelist Configuration
+# Defines which /etc paths can be managed by which cookbooks
+---
+# Paths that are globally allowed (any cookbook can manage)
+global:
+  # Application configuration directories
+  - /etc/myapp/
+  - /etc/default/
+
+  # Logging
+  - /etc/logrotate.d/
+
+  # Profile scripts (non-system)
+  - /etc/profile.d/
+
+# Per-cookbook /etc path permissions
+per_cookbook:
+  b-platform-linux:
+    - /etc/sysctl.conf
+    - /etc/sysctl.d/
+    - /etc/security/limits.conf
+    - /etc/security/limits.d/
+    - /etc/modules-load.d/
+
+  b-sshd:
+    - /etc/ssh/sshd_config
+    - /etc/ssh/ssh_config
+    - /etc/ssh/sshd_config.d/
+
+  b-platform-security:
+    - /etc/pam.d/
+    - /etc/security/
+    - /etc/audit/
+    - /etc/audit/rules.d/
+
+  b-rsyslog:
+    - /etc/rsyslog.conf
+    - /etc/rsyslog.d/
+
+  b-chrony:
+    - /etc/chrony.conf
+    - /etc/chrony.d/
+
+  b-ntp:
+    - /etc/ntp.conf
+    - /etc/ntp/
+
+  b-sssd-config:
+    - /etc/sssd/
+    - /etc/sssd/sssd.conf
+
+  b-kerberos:
+    - /etc/krb5.conf
+    - /etc/krb5.conf.d/
+
+  b-ldap-client:
+    - /etc/openldap/
+    - /etc/ldap/
+    - /etc/nsswitch.conf
+
+  b-firewall:
+    - /etc/firewalld/
+    - /etc/sysconfig/iptables
+    - /etc/sysconfig/ip6tables
+
+  b-selinux:
+    - /etc/selinux/
+    - /etc/sysconfig/selinux
+
+  b-yum-repos:
+    - /etc/yum.repos.d/
+    - /etc/yum.conf
+
+  b-apt-repos:
+    - /etc/apt/sources.list
+    - /etc/apt/sources.list.d/
+    - /etc/apt/apt.conf.d/
+
+  b-network-base:
+    - /etc/hosts
+    - /etc/resolv.conf
+    - /etc/sysconfig/network
+    - /etc/sysconfig/network-scripts/
+    - /etc/netplan/
+
+  b-sudoers:
+    - /etc/sudoers
+    - /etc/sudoers.d/

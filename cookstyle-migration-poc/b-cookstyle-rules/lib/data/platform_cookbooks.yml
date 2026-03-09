@@ -1,0 +1,53 @@
+# Platform/Infrastructure Cookbooks Whitelist
+# These cookbooks are exempt from certain security rules
+# as they manage core platform functionality
+---
+cookbooks:
+  # Base platform cookbooks
+  - b-platform-base
+  - b-platform-linux
+  - b-platform-windows
+  - b-platform-security
+  - b-platform-users
+  - b-platform-groups
+
+  # Identity management
+  - b-ldap-client
+  - b-ad-client
+  - b-sssd-config
+  - b-kerberos
+
+  # Security tooling
+  - b-crowdstrike
+  - b-qualys
+  - b-tanium
+  - b-splunk
+  - b-audit
+  - b-aide
+  - b-ossec
+
+  # Monitoring
+  - b-prometheus
+  - b-nagios
+  - b-zabbix
+  - b-node-exporter
+
+  # System services
+  - b-sshd
+  - b-ntp
+  - b-rsyslog
+  - b-chrony
+
+  # Configuration management
+  - b-chef-client
+  - b-puppet-agent
+
+  # Network
+  - b-firewall
+  - b-iptables
+  - b-network-base
+
+  # Storage
+  - b-lvm
+  - b-filesystem
+  - b-nfs-client

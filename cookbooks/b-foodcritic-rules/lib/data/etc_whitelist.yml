@@ -1,0 +1,16 @@
+# /etc Path Whitelist Configuration
+---
+global:
+  - /etc/profile.d/
+  - /etc/logrotate.d/
+  - /etc/default/
+
+per_cookbook:
+  b-sshd:
+    - /etc/ssh/sshd_config
+  b-rsyslog:
+    - /etc/rsyslog.conf
+    - /etc/rsyslog.d/
+  b-platform-security:
+    - /etc/audit/
+    - /etc/security/

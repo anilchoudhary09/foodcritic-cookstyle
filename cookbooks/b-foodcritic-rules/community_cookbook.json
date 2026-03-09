@@ -1,0 +1,17 @@
+{
+  "openssl" : {
+    "wrapper" : "b_iac_cc_openssl",
+    "methods" : [
+      "openssl_dhparam",
+      "openssl_rsa_key",
+      "openssl_rsa_private_key",
+      "openssl_rsa_public_key",
+      "openssl_ec_private_key",
+      "openssl_ec_public_key",
+      "openssl_x509",
+      "openssl_x509_certificate",
+      "openssl_x509_crl",
+      "openssl_x509_request"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+# Custom Cookstyle/RuboCop Rules
+#
+# This file contains custom rules specific to your organization
+# Include this file in .rubocop.yml using inherit_from
+
+# =============================================================================
+# ORGANIZATION-SPECIFIC RULES
+# =============================================================================
+
+# Require comments for all resources (documentation requirement)
+Style/Documentation:
+  Enabled: false  # Typically disabled for Chef cookbooks
+
+# Enforce specific patterns for our organization
+Chef/Style/UsePlatformHelpers:
+  Enabled: true
+  Description: 'Use platform helpers like platform_family? instead of comparing node attributes'
+
+# =============================================================================
+# COMPANY POLICY: Security Rules
+# =============================================================================
+
+# Ensure SSL verification settings are appropriate
+# Note: Use Chef/Deprecations for SSL-related deprecations
+
+
+# =============================================================================
+# COMPANY POLICY: Resource Naming Conventions
+# =============================================================================
+
+# Custom regex patterns for resource names
+Naming/FileName:
+  Enabled: true
+  ExpectMatchingDefinition: false
+
+# =============================================================================
+# PROJECT-SPECIFIC OVERRIDES
+# =============================================================================
+
+# Allow some Chef-specific patterns that generic RuboCop doesn't understand
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - 'recipes/**/*.rb'
+
+# Chef resources use blocks extensively
+Metrics/BlockNesting:
+  Max: 4

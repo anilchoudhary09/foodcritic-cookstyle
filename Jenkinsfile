@@ -27,7 +27,8 @@ pipeline {
                     echo "Ruby version: $(ruby --version)"
                     echo "Bundler version: $(bundle --version)"
 
-                    # Install dependencies
+                    # Install dependencies in my-app-cookbook
+                    cd cookbooks/my-app-cookbook
                     bundle install --path vendor/bundle --jobs 4
                 '''
             }
@@ -43,6 +44,7 @@ pipeline {
                             echo "║           RUNNING COOKSTYLE ANALYSIS                      ║"
                             echo "╚═══════════════════════════════════════════════════════════╝"
 
+                            cd cookbooks/my-app-cookbook
                             bundle exec cookstyle . \
                                 --format progress \
                                 --format json --out cookstyle-report.json \
@@ -65,8 +67,8 @@ pipeline {
         stage('Analyze Results') {
             steps {
                 script {
-                    if (fileExists('cookstyle-report.json')) {
-                        def report = readJSON file: 'cookstyle-report.json'
+                    if (fileExists('cookbooks/my-app-cookbook/cookstyle-report.json')) {
+                        def report = readJSON file: 'cookbooks/my-app-cookbook/cookstyle-report.json'
                         def summary = report.summary
 
                         // Count by severity
@@ -136,14 +138,14 @@ pipeline {
     post {
         always {
             // Archive reports
-            archiveArtifacts artifacts: 'cookstyle-report.*', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'cookbooks/my-app-cookbook/cookstyle-report.*', allowEmptyArchive: true
 
             // Publish HTML report (requires HTML Publisher plugin)
             publishHTML(target: [
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '.',
+                reportDir: 'cookbooks/my-app-cookbook',
                 reportFiles: 'cookstyle-report.html',
                 reportName: 'Cookstyle Report'
             ])

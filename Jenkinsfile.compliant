@@ -24,10 +24,6 @@ pipeline {
                     echo "Ruby version: $(ruby --version)"
                     echo "Bundler version: $(bundle --version)"
 
-                    # Ensure build dependencies are installed
-                    sudo apt-get update -qq
-                    sudo apt-get install -y -qq build-essential ruby-dev
-
                     cd cookbooks/compliant-cookbook
                     rm -f Gemfile.lock
                     bundle install --jobs 4

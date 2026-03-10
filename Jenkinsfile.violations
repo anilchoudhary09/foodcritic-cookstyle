@@ -22,11 +22,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Ruby version: $(ruby --version)"
-                    echo "Bundler version: $(bundle --version)"
-
-                    cd cookbooks/my-app-cookbook
-                    rm -f Gemfile.lock
-                    bundle install --jobs 4
+                    echo "Cookstyle version: $(cookstyle --version)"
                 '''
             }
         }
@@ -42,7 +38,7 @@ pipeline {
                             echo "╚═══════════════════════════════════════════════════════════╝"
 
                             cd cookbooks/my-app-cookbook
-                            bundle exec cookstyle . \
+                            cookstyle . \
                                 --format progress \
                                 --format json --out cookstyle-report.json
 

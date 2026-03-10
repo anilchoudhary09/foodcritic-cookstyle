@@ -1,11 +1,26 @@
-// Jenkinsfile - Cookstyle Pipeline for Chef Cookbook Validation
+// Jenkinsfile - Dynamic Cookstyle Pipeline for Chef Cookbook Validation
 //
 // This pipeline validates cookbooks against:
 // 1. Standard Cookstyle rules (200+ Chef best practices)
 // 2. Custom BARC rules (organization security policies)
+//
+// Usage: Select cookbook from dropdown when running "Build with Parameters"
 
 pipeline {
     agent any
+
+    parameters {
+        choice(
+            name: 'COOKBOOK_NAME',
+            choices: ['my-app-cookbook', 'compliant-cookbook'],
+            description: 'Select the cookbook to validate with Cookstyle'
+        )
+        booleanParam(
+            name: 'FAIL_ON_VIOLATIONS',
+            defaultValue: true,
+            description: 'Fail the build if violations are found'
+        )
+    }
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
@@ -17,55 +32,44 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                echo "Checked out: ${env.GIT_COMMIT}"
+                echo "Validating cookbook: ${params.COOKBOOK_NAME}"
             }
         }
 
         stage('Setup') {
             steps {
-                sh '''
-                    echo "Ruby version: $(ruby --version)"
-                    echo "Bundler version: $(bundle --version)"
-
-                    # Install dependencies in my-app-cookbook
-                    cd cookbooks/my-app-cookbook
-
-                    # Remove old lockfile to avoid Ruby 3.2 compatibility issues
-                    rm -f Gemfile.lock
-
-                    bundle install --jobs 4
-                '''
+                sh """
+                    echo "Ruby version: \$(ruby --version)"
+                    echo "Cookstyle version: \$(cookstyle --version)"
+                    echo ""
+                    echo "Selected Cookbook: ${params.COOKBOOK_NAME}"
+                """
             }
         }
 
         stage('Cookstyle Lint') {
             steps {
                 script {
-                    // Run cookstyle and capture exit code
-                    def exitCode = sh(
-                        script: '''
-                            echo "╔═══════════════════════════════════════════════════════════╗"
-                            echo "║           RUNNING COOKSTYLE ANALYSIS                      ║"
-                            echo "╚═══════════════════════════════════════════════════════════╝"
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+                    
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║           COOKSTYLE ANALYSIS: ${params.COOKBOOK_NAME}"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
 
-                            cd cookbooks/my-app-cookbook
-                            bundle exec cookstyle . \
-                                --format progress \
-                                --format json --out cookstyle-report.json
+                        cd ${cookbookPath}
+                        
+                        # Run cookstyle and generate JSON report
+                        cookstyle . \\
+                            --format progress \\
+                            --format json --out cookstyle-report.json || true
 
-                            # Generate beautiful HTML report
-                            ruby scripts/generate_report.rb cookstyle-report.json > cookstyle-report.html
-                        ''',
-                        returnStatus: true
-                    )
-
-                    env.COOKSTYLE_EXIT_CODE = exitCode.toString()
-
-                    if (exitCode != 0) {
-                        echo "⚠️  Cookstyle found violations (exit code: ${exitCode})"
-                    } else {
-                        echo "✅ Cookstyle passed with no violations"
-                    }
+                        # Generate beautiful HTML report
+                        if [ -f cookstyle-report.json ]; then
+                            ruby ../my-app-cookbook/scripts/generate_report.rb cookstyle-report.json > cookstyle-report.html
+                            echo "HTML Report generated successfully"
+                        fi
+                    """
                 }
             }
         }
@@ -73,8 +77,10 @@ pipeline {
         stage('Analyze Results') {
             steps {
                 script {
-                    if (fileExists('cookbooks/my-app-cookbook/cookstyle-report.json')) {
-                        def report = readJSON file: 'cookbooks/my-app-cookbook/cookstyle-report.json'
+                    def reportPath = "cookbooks/${params.COOKBOOK_NAME}/cookstyle-report.json"
+                    
+                    if (fileExists(reportPath)) {
+                        def report = readJSON file: reportPath
                         def summary = report.summary
 
                         // Count by severity
@@ -98,43 +104,65 @@ pipeline {
                             }
                         }
 
+                        // Determine status
+                        def status = errors > 0 ? 'FAIL' : 'PASS'
+                        
                         echo """
 ╔═══════════════════════════════════════════════════════════╗
 ║              COOKSTYLE ANALYSIS RESULTS                   ║
 ╠═══════════════════════════════════════════════════════════╣
-║  Files Inspected:  ${summary.inspected_file_count.toString().padLeft(5)}                                 ║
-║  Total Offenses:   ${summary.offense_count.toString().padLeft(5)}                                 ║
+║  Cookbook:         ${params.COOKBOOK_NAME}
+║  Status:           ${status}
 ║  ─────────────────────────────────────────                ║
-║  🔴 Errors:        ${errors.toString().padLeft(5)}                                 ║
-║  🟡 Warnings:      ${warnings.toString().padLeft(5)}                                 ║
-║  🔵 Conventions:   ${conventions.toString().padLeft(5)}                                 ║
+║  Files Inspected:  ${summary.inspected_file_count}
+║  Total Offenses:   ${summary.offense_count}
+║  ─────────────────────────────────────────                ║
+║  Errors:           ${errors}
+║  Warnings:         ${warnings}
+║  Conventions:      ${conventions}
 ╚═══════════════════════════════════════════════════════════╝
                         """
 
-                        // List top violations
-                        def violationsByType = [:]
+                        // List BARC violations separately
+                        def barcViolations = [:]
+                        def chefViolations = [:]
+                        
                         report.files.each { file ->
                             file.offenses.each { offense ->
-                                def cop = offense.cop_name
-                                violationsByType[cop] = (violationsByType[cop] ?: 0) + 1
+                                if (offense.cop_name.startsWith('Barclays/')) {
+                                    barcViolations[offense.cop_name] = (barcViolations[offense.cop_name] ?: 0) + 1
+                                } else {
+                                    chefViolations[offense.cop_name] = (chefViolations[offense.cop_name] ?: 0) + 1
+                                }
                             }
                         }
 
-                        if (violationsByType.size() > 0) {
-                            echo "Top Violations:"
-                            violationsByType.sort { -it.value }.take(10).each { cop, count ->
-                                echo "  ${count.toString().padLeft(3)} - ${cop}"
+                        if (barcViolations.size() > 0) {
+                            echo "BARC Security Violations:"
+                            barcViolations.sort { -it.value }.each { cop, count ->
+                                echo "   ${count} - ${cop}"
                             }
                         }
 
-                        // Fail build on errors
-                        if (errors > 0) {
+                        if (chefViolations.size() > 0) {
+                            echo "Chef Best Practice Violations:"
+                            chefViolations.sort { -it.value }.take(5).each { cop, count ->
+                                echo "   ${count} - ${cop}"
+                            }
+                        }
+
+                        // Handle build result
+                        if (errors > 0 && params.FAIL_ON_VIOLATIONS) {
                             currentBuild.result = 'FAILURE'
-                            error "❌ Build failed: Found ${errors} error-level violations"
+                            error "Build failed: Found ${errors} error-level violations in ${params.COOKBOOK_NAME}"
                         } else if (warnings > 0) {
                             currentBuild.result = 'UNSTABLE'
-                            echo "⚠️  Build unstable: Found ${warnings} warnings"
+                            echo "Build unstable: Found ${warnings} warnings"
+                        } else if (summary.offense_count == 0) {
+                            echo "${params.COOKBOOK_NAME} passed all checks!"
                         }
+                    } else {
+                        error "Report file not found: ${reportPath}"
                     }
                 }
             }
@@ -144,45 +172,46 @@ pipeline {
     post {
         always {
             // Archive reports
-            archiveArtifacts artifacts: 'cookbooks/my-app-cookbook/cookstyle-report.*', allowEmptyArchive: true
+            archiveArtifacts artifacts: "cookbooks/${params.COOKBOOK_NAME}/cookstyle-report.*", allowEmptyArchive: true
 
-            // Publish HTML report (requires HTML Publisher plugin)
+            // Publish HTML report
             publishHTML(target: [
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'cookbooks/my-app-cookbook',
+                reportDir: "cookbooks/${params.COOKBOOK_NAME}",
                 reportFiles: 'cookstyle-report.html',
-                reportName: 'Cookstyle Report'
+                reportName: "Cookstyle Report - ${params.COOKBOOK_NAME}"
             ])
-
-            // Clean workspace
-            cleanWs(cleanWhenSuccess: true, cleanWhenFailure: false)
         }
 
         success {
-            echo '''
+            echo """
 ╔═══════════════════════════════════════════════════════════╗
-║  ✅ BUILD SUCCESS - Cookbook passed all validations       ║
+║  BUILD SUCCESS                                            ║
+║  Cookbook: ${params.COOKBOOK_NAME}
 ╚═══════════════════════════════════════════════════════════╝
-            '''
+            """
         }
 
         unstable {
-            echo '''
+            echo """
 ╔═══════════════════════════════════════════════════════════╗
-║  ⚠️  BUILD UNSTABLE - Warnings found, review report       ║
+║  BUILD UNSTABLE - Warnings found                          ║
+║  Cookbook: ${params.COOKBOOK_NAME}
+║  Review the Cookstyle Report for details                  ║
 ╚═══════════════════════════════════════════════════════════╝
-            '''
+            """
         }
 
         failure {
-            echo '''
+            echo """
 ╔═══════════════════════════════════════════════════════════╗
-║  ❌ BUILD FAILED - Critical violations found              ║
-║     Review cookstyle-report.html for details              ║
+║  BUILD FAILED - Violations detected                       ║
+║  Cookbook: ${params.COOKBOOK_NAME}
+║  Review the Cookstyle Report for details                  ║
 ╚═══════════════════════════════════════════════════════════╝
-            '''
+            """
         }
     }
 }

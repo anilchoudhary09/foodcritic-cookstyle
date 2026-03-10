@@ -29,7 +29,10 @@ pipeline {
 
                     # Install dependencies in my-app-cookbook
                     cd cookbooks/my-app-cookbook
-                    bundle config set --local path vendor/bundle
+
+                    # Remove old lockfile to avoid Ruby 3.2 compatibility issues
+                    rm -f Gemfile.lock
+
                     bundle install --jobs 4
                 '''
             }

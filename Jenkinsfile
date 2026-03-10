@@ -51,8 +51,10 @@ pipeline {
                             cd cookbooks/my-app-cookbook
                             bundle exec cookstyle . \
                                 --format progress \
-                                --format json --out cookstyle-report.json \
-                                --format html --out cookstyle-report.html
+                                --format json --out cookstyle-report.json
+
+                            # Generate beautiful HTML report
+                            ruby scripts/generate_report.rb cookstyle-report.json > cookstyle-report.html
                         ''',
                         returnStatus: true
                     )

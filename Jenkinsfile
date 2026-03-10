@@ -29,7 +29,8 @@ pipeline {
 
                     # Install dependencies in my-app-cookbook
                     cd cookbooks/my-app-cookbook
-                    bundle install --path vendor/bundle --jobs 4
+                    bundle config set --local path vendor/bundle
+                    bundle install --jobs 4
                 '''
             }
         }

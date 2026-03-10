@@ -38,12 +38,19 @@ pipeline {
                             echo "╚═══════════════════════════════════════════════════════════╝"
 
                             cd cookbooks/compliant-cookbook
+
+                            # Run cookstyle (ignore exit code, we handle it later)
                             cookstyle . \
                                 --format progress \
-                                --format json --out cookstyle-report.json
+                                --format json --out cookstyle-report.json || true
 
                             # Generate beautiful HTML report
-                            ruby ../my-app-cookbook/scripts/generate_report.rb cookstyle-report.json > cookstyle-report.html
+                            if [ -f cookstyle-report.json ]; then
+                                ruby ../my-app-cookbook/scripts/generate_report.rb cookstyle-report.json > cookstyle-report.html
+                            fi
+
+                            # Return proper exit code based on violations
+                            cookstyle . --format quiet
                         ''',
                         returnStatus: true
                     )

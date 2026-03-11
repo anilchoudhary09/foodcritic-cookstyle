@@ -132,11 +132,11 @@ module RuboCop
     module Barclays
       class Barc001NoLocalUsers < Base
         MSG = 'BARC001: Do not create local users'
-        
+
         def_node_matcher :user_resource?, <<~PATTERN
           (block (send nil? :user ...) ...)
         PATTERN
-        
+
         def on_block(node)
           return unless user_resource?(node)
           add_offense(node)

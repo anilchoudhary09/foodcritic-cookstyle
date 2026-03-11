@@ -25,7 +25,7 @@ The custom Cookstyle cops library containing 12 BARC security rules. This is not
 
 A demonstration cookbook with **intentional violations** for testing the BARC rules.
 
-**Purpose:** Verify that custom cops detect violations correctly  
+**Purpose:** Verify that custom cops detect violations correctly
 **Expected Result:** ❌ ~31 violations detected
 
 **Files:**
@@ -37,7 +37,7 @@ A demonstration cookbook with **intentional violations** for testing the BARC ru
 
 A demonstration cookbook following all best practices with **zero violations**.
 
-**Purpose:** Show compliant code patterns  
+**Purpose:** Show compliant code patterns
 **Expected Result:** ✅ 0 violations
 
 **Files:**

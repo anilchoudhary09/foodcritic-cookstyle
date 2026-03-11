@@ -51,14 +51,14 @@ pipeline {
             steps {
                 script {
                     def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
-                    
+
                     sh """
                         echo "╔═══════════════════════════════════════════════════════════╗"
                         echo "║           COOKSTYLE ANALYSIS: ${params.COOKBOOK_NAME}"
                         echo "╚═══════════════════════════════════════════════════════════╝"
 
                         cd ${cookbookPath}
-                        
+
                         # Run cookstyle and generate JSON report
                         cookstyle . \\
                             --format progress \\
@@ -78,7 +78,7 @@ pipeline {
             steps {
                 script {
                     def reportPath = "cookbooks/${params.COOKBOOK_NAME}/cookstyle-report.json"
-                    
+
                     if (fileExists(reportPath)) {
                         def report = readJSON file: reportPath
                         def summary = report.summary
@@ -106,7 +106,7 @@ pipeline {
 
                         // Determine status
                         def status = errors > 0 ? 'FAIL' : 'PASS'
-                        
+
                         echo """
 ╔═══════════════════════════════════════════════════════════╗
 ║              COOKSTYLE ANALYSIS RESULTS                   ║
@@ -126,7 +126,7 @@ pipeline {
                         // List BARC violations separately
                         def barcViolations = [:]
                         def chefViolations = [:]
-                        
+
                         report.files.each { file ->
                             file.offenses.each { offense ->
                                 if (offense.cop_name.startsWith('Barclays/')) {

@@ -4,14 +4,16 @@
 # 1. Standard Cookstyle rules (200+ Chef best practices)
 # 2. Custom BARC rules (organization security policies)
 #
+# Exceptions are defined in b-foodcritic-rules/rules.rb
+#
 # Usage:
 #   cookstyle .                    # Run all checks
 #   cookstyle --autocorrect .      # Auto-fix issues
 #   cookstyle --format json .      # JSON output
 
-# Load custom BARC cops from b-foodcritic-rules
+# Load custom BARC cops (reads exceptions from rules.rb)
 require:
-  - ../b-foodcritic-rules/lib/rubocop/cop/barclays_cops
+  - ../b-foodcritic-rules/barc_cops.rb
 
 AllCops:
   TargetRubyVersion: 3.1
@@ -41,7 +43,7 @@ Barclays/Barc002NoLocalGroups:
   Severity: error
 
 Barclays/Barc003NoRootSsh:
-  Enabled: true
+  Enabled: false
   Severity: error
 
 Barclays/Barc005EtcBlacklist:

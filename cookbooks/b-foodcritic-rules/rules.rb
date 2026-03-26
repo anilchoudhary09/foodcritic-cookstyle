@@ -1372,7 +1372,7 @@
                     'BarcMW_DaffyLinux',
                     'BarcMW_IBMIM',
                     'corporate_digital_nginx_srv', # CHG1009200452
-		    'BarcPaas-wily-epaagent-binaries-openshift10', # CHG1020070578 
+		    'BarcPaas-wily-epaagent-binaries-openshift10', # CHG1020070578
                     'BarcMW_IBMSDS',
                     'BarcMW_ISDSLinux',
                     'BarcMW_WAS7',

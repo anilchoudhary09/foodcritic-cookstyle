@@ -1,8 +1,10 @@
-# b-cookstyle-rules - Custom Cookstyle Cops for Organization
+# b-foodcritic-rules - Custom Cookstyle Cops for Organization
 #
 # This configuration enables both:
 # 1. Standard Cookstyle rules (200+ Chef best practices)
 # 2. Custom BARC rules (organization security policies)
+#
+# Exceptions are loaded from rules.rb (same format as original Foodcritic rules)
 #
 # Usage:
 #   cookstyle .                    # Run all checks
@@ -14,9 +16,9 @@
 
 inherit_from: .rubocop_todo.yml
 
-# Load custom BARC cops
+# Load custom BARC cops (reads exceptions from rules.rb)
 require:
-  - ./lib/rubocop/cop/barclays_cops
+  - ./barc_cops.rb
 
 AllCops:
   TargetRubyVersion: 3.1

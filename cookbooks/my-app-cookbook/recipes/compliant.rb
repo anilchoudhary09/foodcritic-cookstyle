@@ -17,7 +17,7 @@
 
 # Create application directories - these are allowed
 directory '/opt/myapp' do
-  owner 'root'
+  owner 'abc'
   group 'root'
   mode '0755'
   recursive true

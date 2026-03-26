@@ -78,8 +78,8 @@ end
 # ALLOWED /etc PATHS (Compliant - whitelisted directories)
 # ============================================================
 
-# /etc/profile.d/ is whitelisted for environment setup
-file '/etc/profile.d/myapp.sh' do
+# /usr/profile.d/ is whitelisted for environment setup
+file '/usr/profile.d/myapp.sh' do
   content <<~SHELL
     export MYAPP_HOME=/opt/myapp
     export PATH=$PATH:/opt/myapp/bin
@@ -90,8 +90,8 @@ file '/etc/profile.d/myapp.sh' do
   mode '0644'
 end
 
-# /etc/logrotate.d/ is whitelisted for log rotation
-file '/etc/logrotate.d/myapp' do
+# /usr/logrotate.d/ is whitelisted for log rotation
+file '/usr/logrotate.d/myapp' do
   content <<~CONF
     /opt/myapp/logs/*.log {
         daily

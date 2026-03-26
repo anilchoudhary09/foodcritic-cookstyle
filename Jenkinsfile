@@ -88,13 +88,13 @@ pipeline {
                                 ruby -rjson -e '
                                     report = JSON.parse(File.read("cookstyle-report.json"))
                                     summary = report["summary"]
-                                    
+
                                     errors = 0
                                     warnings = 0
                                     conventions = 0
                                     barc_violations = {}
                                     chef_violations = {}
-                                    
+
                                     report["files"].each do |file|
                                         file["offenses"].each do |offense|
                                             case offense["severity"]
@@ -105,7 +105,7 @@ pipeline {
                                             else
                                                 conventions += 1
                                             end
-                                            
+
                                             cop = offense["cop_name"]
                                             if cop.start_with?("Barclays/")
                                                 barc_violations[cop] = (barc_violations[cop] || 0) + 1
@@ -114,21 +114,21 @@ pipeline {
                                             end
                                         end
                                     end
-                                    
+
                                     status = errors > 0 ? "FAIL" : "PASS"
-                                    
+
                                     puts "FILES_INSPECTED=#{summary["inspected_file_count"]}"
                                     puts "TOTAL_OFFENSES=#{summary["offense_count"]}"
                                     puts "ERRORS=#{errors}"
                                     puts "WARNINGS=#{warnings}"
                                     puts "CONVENTIONS=#{conventions}"
                                     puts "STATUS=#{status}"
-                                    
+
                                     if barc_violations.any?
                                         puts "BARC_VIOLATIONS:"
                                         barc_violations.sort_by { |k, v| -v }.each { |cop, count| puts "  #{count} - #{cop}" }
                                     end
-                                    
+
                                     if chef_violations.any?
                                         puts "CHEF_VIOLATIONS:"
                                         chef_violations.sort_by { |k, v| -v }.take(5).each { |cop, count| puts "  #{count} - #{cop}" }

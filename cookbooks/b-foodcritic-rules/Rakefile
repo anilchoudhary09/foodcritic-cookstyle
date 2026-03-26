@@ -174,7 +174,7 @@ end
 def erb_table_0
 <<-'EOH'
 
-<%= header.first %> | 
+<%= header.first %> |
 ---- | <%= -%>
 <% body.keys.sort.each do |key| %>
 <%= key -%> | <%= -%>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Foodcritic to Cookstyle Migration Guide</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; line-height: 1.6; color: #172B4D; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { color: #0052CC; border-bottom: 3px solid #0052CC; padding-bottom: 10px; }
+        h2 { color: #172B4D; border-bottom: 2px solid #DFE1E6; padding-bottom: 8px; margin-top: 30px; }
+        h3 { color: #42526E; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th { background-color: #0052CC; color: white; padding: 12px; text-align: left; }
+        td { border: 1px solid #DFE1E6; padding: 10px; }
+        tr:nth-child(even) { background-color: #F4F5F7; }
+        code { background-color: #F4F5F7; padding: 2px 6px; border-radius: 3px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; }
+        pre { background-color: #172B4D; color: #B3BAC5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        pre code { background-color: transparent; color: #B3BAC5; }
+        .info-box { background-color: #DEEBFF; border-left: 4px solid #0052CC; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .success-box { background-color: #E3FCEF; border-left: 4px solid #00875A; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .warning-box { background-color: #FFFAE6; border-left: 4px solid #FF8B00; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .check { color: #00875A; font-weight: bold; }
+        .cross { color: #DE350B; font-weight: bold; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .badge-new { background-color: #00875A; color: white; }
+        .badge-preserved { background-color: #0052CC; color: white; }
+        .badge-deprecated { background-color: #DE350B; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>🔄 Foodcritic to Cookstyle Migration Guide</h1>
+
+<div class="info-box">
+    <strong>Purpose:</strong> This document describes the modernization of <code>b-cookstyle-rules</code> from the deprecated Foodcritic tool to the actively maintained Cookstyle (RuboCop-based) framework, while preserving all existing exception configurations.
+</div>
+
+<h2>📋 Executive Summary</h2>
+
+<table>
+    <tr>
+        <th>Aspect</th>
+        <th>Before</th>
+        <th>After</th>
+    </tr>
+    <tr>
+        <td><strong>Tool</strong></td>
+        <td><span class="badge badge-deprecated">Foodcritic (Deprecated 2019)</span></td>
+        <td><span class="badge badge-new">Cookstyle (Active)</span></td>
+    </tr>
+    <tr>
+        <td><strong>Built-in Rules</strong></td>
+        <td>~100 rules</td>
+        <td>200+ Chef best practices</td>
+    </tr>
+    <tr>
+        <td><strong>Auto-fix Capability</strong></td>
+        <td><span class="cross">✗ No</span></td>
+        <td><span class="check">✓ Yes</span></td>
+    </tr>
+    <tr>
+        <td><strong>Exception File (rules.rb)</strong></td>
+        <td>2,800+ lines</td>
+        <td><span class="badge badge-preserved">PRESERVED</span> - Same file</td>
+    </tr>
+    <tr>
+        <td><strong>Pipeline Changes</strong></td>
+        <td>-</td>
+        <td>Minimal - same structure</td>
+    </tr>
+</table>
+
+<h2>📁 Directory Structure Comparison</h2>
+
+<table>
+    <tr>
+        <th>File</th>
+        <th>OLD (Foodcritic)</th>
+        <th>NEW (Cookstyle)</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td><code>.rubocop.yml</code></td>
+        <td>1 line (inherit only)</td>
+        <td>50+ lines</td>
+        <td>Enhanced with cop configurations</td>
+    </tr>
+    <tr>
+        <td><code>rules.rb</code></td>
+        <td>2,800+ lines</td>
+        <td>Same file</td>
+        <td><span class="badge badge-preserved">PRESERVED</span> - Contains all exceptions</td>
+    </tr>
+    <tr>
+        <td><code>barc_cops.rb</code></td>
+        <td><span class="cross">✗ Does not exist</span></td>
+        <td><span class="badge badge-new">NEW</span> ~400 lines</td>
+        <td>Cookstyle cops reading rules.rb</td>
+    </tr>
+    <tr>
+        <td><code>Rakefile</code></td>
+        <td><span class="check">✓</span></td>
+        <td><span class="check">✓ Same</span></td>
+        <td>Pipeline compatible</td>
+    </tr>
+    <tr>
+        <td><code>spec/</code></td>
+        <td><span class="check">✓</span></td>
+        <td><span class="check">✓ Same</span></td>
+        <td>Pipeline compatible</td>
+    </tr>
+</table>
+
+<h2>🔧 Technology Migration Details</h2>
+
+<table>
+    <tr>
+        <th>Aspect</th>
+        <th>OLD (Foodcritic)</th>
+        <th>NEW (Cookstyle)</th>
+    </tr>
+    <tr>
+        <td><strong>Tool</strong></td>
+        <td>Foodcritic (deprecated 2019)</td>
+        <td>Cookstyle (RuboCop-based)</td>
+    </tr>
+    <tr>
+        <td><strong>Command</strong></td>
+        <td><code>foodcritic -I rules.rb cookbooks</code></td>
+        <td><code>cookstyle .</code></td>
+    </tr>
+    <tr>
+        <td><strong>Rule Syntax</strong></td>
+        <td>DSL with <code>rule 'BARC001' do ... end</code></td>
+        <td>RuboCop Cop classes</td>
+    </tr>
+    <tr>
+        <td><strong>AST Parser</strong></td>
+        <td>Custom Foodcritic parser</td>
+        <td>RuboCop AST (more powerful)</td>
+    </tr>
+    <tr>
+        <td><strong>Auto-fix</strong></td>
+        <td><span class="cross">✗ No</span></td>
+        <td><span class="check">✓ Yes</span> (where possible)</td>
+    </tr>
+    <tr>
+        <td><strong>Output Formats</strong></td>
+        <td>Text only</td>
+        <td>JSON, HTML, Progress, etc.</td>
+    </tr>
+    <tr>
+        <td><strong>Built-in Rules</strong></td>
+        <td>~100</td>
+        <td>200+ Chef best practices</td>
+    </tr>
+</table>
+
+<h2>📝 Rule Definition Syntax Change</h2>
+
+<h3>OLD Foodcritic Syntax (rules.rb)</h3>
+<pre><code>rule 'BARC001', 'Do not manipulate users locally' do
+  tags %w[barc unix windows security]
+  recipe do |ast, filename|
+    violations = []
+    ckbname = cookbook_name(filename)
+    next if @platform_cookbook_whitelist.include?(ckbname)
+
+    violations &lt;&lt; find_resources(ast, type: 'user')
+    violations &lt;&lt; find_violations_cmd_unix(ast, unix_forbidden_cmds, ckbname)
+    violations.flatten
+  end
+end</code></pre>
+
+<h3>NEW Cookstyle Syntax (barc_cops.rb)</h3>
+<pre><code>class Barc001NoLocalUsers &lt; Base
+  MSG = 'BARC001: Do not create local users. Use Active Directory instead.'
+  USER_COMMANDS = %w[useradd adduser usermod userdel passwd].freeze
+
+  def on_block(node)
+    add_offense(node.send_node) if user_resource?(node)
+
+    return unless execute_resource?(node) || bash_resource?(node)
+    find_command_strings(node).each do |cmd_node, cmd|
+      add_offense(cmd_node) if USER_COMMANDS.any? { |c| cmd =~ /\b#{c}\b/ }
+    end
+  end
+end</code></pre>
+
+<h2>🔒 Exception Handling (PRESERVED)</h2>
+
+<div class="success-box">
+    <strong>Key Innovation:</strong> All existing exceptions are preserved in the same <code>rules.rb</code> file format. No re-approval needed for 500+ CHG tickets.
+</div>
+
+<h3>Exception Data Structures (Unchanged)</h3>
+<pre><code># rules.rb - UNCHANGED from original
+@restricted_services = {
+  'rsyslog' =&gt; ['is-apaaseng-osev3-b-openshift3_enterprise',
+                'is_mw_iib10_build', ...],
+  'docker' =&gt; [],  # Empty array = allowed for ALL cookbooks
+  ...
+}
+
+@etc_whitelist = {
+  '/etc/sudoers' =&gt; ['is_uisec_unix_sudo', 'is_mw_tomcat8_build2018', ...],
+  '/etc/rsyslog.d/' =&gt; [],  # Empty = allowed for all
+  ...
+}
+
+@system_services = %w[
+  dhcpd ntpd sshd rsyslogd auditd ...
+]</code></pre>
+
+<h3>How barc_cops.rb Reads Exceptions</h3>
+<pre><code>module BarcRulesData
+  def load_rules!
+    context.instance_eval(File.read('rules.rb'))
+    @restricted_services = context.restricted_services
+    @etc_whitelist = context.etc_whitelist
+  end
+
+  def service_whitelisted?(service_name, cookbook_name)
+    key = find_service_key(service_name)
+    allowed = @restricted_services[key]
+    allowed.empty? || allowed.include?(cookbook_name)
+  end
+end</code></pre>
+
+<h2>📊 BARC Rules Implemented</h2>
+
+<table>
+    <tr>
+        <th>Rule</th>
+        <th>Description</th>
+        <th>Severity</th>
+    </tr>
+    <tr>
+        <td><code>BARC001</code></td>
+        <td>Do not create local users - use Active Directory</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC002</code></td>
+        <td>Do not create local groups - use Active Directory</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC003</code></td>
+        <td>Do not modify root .ssh files</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC005</code></td>
+        <td>Do not modify protected /etc paths</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC006</code></td>
+        <td>Do not reboot/halt/shutdown nodes</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC007</code></td>
+        <td>Do not modify SELinux configuration</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC008</code></td>
+        <td>Do not kill processes</td>
+        <td>Warning</td>
+    </tr>
+    <tr>
+        <td><code>BARC009</code></td>
+        <td>Do not modify firewall rules</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC011</code></td>
+        <td>Do not use dangerous file removal (rm -rf)</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC016</code></td>
+        <td>Use Chef resources instead of shell commands</td>
+        <td>Convention</td>
+    </tr>
+    <tr>
+        <td><code>BARC017</code></td>
+        <td>Do not manage system services</td>
+        <td>Error</td>
+    </tr>
+    <tr>
+        <td><code>BARC019</code></td>
+        <td>Do not use find/sudo/chmod 777</td>
+        <td>Error</td>
+    </tr>
+</table>
+
+<h2>🚀 Usage Comparison</h2>
+
+<h3>OLD Command</h3>
+<pre><code>foodcritic -t barc -f security -I rules.rb cookbooks/my-cookbook</code></pre>
+
+<h3>NEW Commands</h3>
+<pre><code># Run all checks
+cookstyle .
+
+# JSON output for CI/CD
+cookstyle . --format json --out cookstyle-report.json
+
+# Auto-fix where possible
+cookstyle . --autocorrect
+
+# Generate HTML report
+ruby scripts/generate_report.rb cookstyle-report.json &gt; report.html</code></pre>
+
+<h2>✅ What Was Modernized</h2>
+
+<table>
+    <tr>
+        <th>Change</th>
+        <th>Benefit</th>
+    </tr>
+    <tr>
+        <td>RuboCop AST patterns</td>
+        <td>More precise node matching, fewer false positives</td>
+    </tr>
+    <tr>
+        <td><code>def_node_matcher</code></td>
+        <td>Pattern-based resource detection</td>
+    </tr>
+    <tr>
+        <td>Class-based cops</td>
+        <td>Reusable, testable, maintainable code</td>
+    </tr>
+    <tr>
+        <td><code>.rubocop.yml</code> configuration</td>
+        <td>Enable/disable cops, set severity per rule</td>
+    </tr>
+    <tr>
+        <td>Integrated with Cookstyle</td>
+        <td>Get 200+ built-in Chef rules FREE</td>
+    </tr>
+    <tr>
+        <td>JSON output</td>
+        <td>CI/CD friendly, beautiful HTML reports</td>
+    </tr>
+    <tr>
+        <td>Auto-correction</td>
+        <td>Some issues can be auto-fixed</td>
+    </tr>
+</table>
+
+<h2>🔄 What Was Preserved</h2>
+
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Reason</th>
+    </tr>
+    <tr>
+        <td><code>rules.rb</code> with all exceptions</td>
+        <td>No re-approval needed for 500+ CHG tickets</td>
+    </tr>
+    <tr>
+        <td><code>@restricted_services</code> format</td>
+        <td>Same hash structure, same cookbook lists</td>
+    </tr>
+    <tr>
+        <td><code>@etc_whitelist</code> format</td>
+        <td>Same hash structure</td>
+    </tr>
+    <tr>
+        <td><code>@system_services</code> list</td>
+        <td>Same array of restricted services</td>
+    </tr>
+    <tr>
+        <td><code>spec/</code> folder</td>
+        <td>Existing pipeline runs RSpec tests</td>
+    </tr>
+    <tr>
+        <td><code>Rakefile</code></td>
+        <td>Same pipeline tasks work</td>
+    </tr>
+</table>
+
+<h2>🎯 Migration Benefits Summary</h2>
+
+<div class="success-box">
+<pre style="background: transparent; color: inherit; margin: 0;">
+┌─────────────────────────────────────────────────────────────┐
+│                    MODERNIZATION BENEFITS                    │
+├─────────────────────────────────────────────────────────────┤
+│ ✅ Foodcritic deprecated → Cookstyle actively maintained    │
+│ ✅ 200+ additional Chef best practice rules FREE            │
+│ ✅ Auto-fix capability for many violations                  │
+│ ✅ Better IDE integration (VS Code, RubyMine)              │
+│ ✅ JSON output for Jenkins HTML reports                     │
+│ ✅ Same exceptions file (rules.rb) - no re-approvals        │
+│ ✅ Same pipeline structure - minimal changes                │
+│ ✅ More precise AST matching (fewer false positives)        │
+└─────────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<h2>📦 Jenkins Pipeline Integration</h2>
+
+<div class="info-box">
+    The Jenkins pipeline supports dynamic cookbook selection with parameter-based builds.
+</div>
+
+<h3>Pipeline Parameters</h3>
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><code>COOKBOOK_NAME</code></td>
+        <td>Choice</td>
+        <td>Select cookbook to validate</td>
+    </tr>
+    <tr>
+        <td><code>FAIL_ON_VIOLATIONS</code></td>
+        <td>Boolean</td>
+        <td>Fail build if violations found (default: true)</td>
+    </tr>
+</table>
+
+<h3>Pipeline Stages</h3>
+<ol>
+    <li><strong>Checkout</strong> - Clone repository</li>
+    <li><strong>Setup</strong> - Verify Ruby and Cookstyle versions</li>
+    <li><strong>Cookstyle Lint</strong> - Run validation with JSON output</li>
+    <li><strong>Analyze Results</strong> - Parse JSON, categorize violations</li>
+    <li><strong>Post Actions</strong> - Archive artifacts, publish HTML report</li>
+</ol>
+
+<h2>📚 Adding New Cookbook Exceptions</h2>
+
+<p>To add a new cookbook exception, edit <code>rules.rb</code> (same as before):</p>
+
+<pre><code># Add service exception
+@restricted_services = {
+  'my-new-service' =&gt; ['my_cookbook_name'],  # CHG123456789
+  ...
+}
+
+# Add /etc path exception
+@etc_whitelist = {
+  '/etc/myapp/config.conf' =&gt; ['my_cookbook_name'],  # CHG123456789
+  ...
+}</code></pre>
+
+<div class="warning-box">
+    <strong>Note:</strong> All exceptions must be approved via Change Request (CHG) and documented with the ticket number.
+</div>
+
+<hr>
+<p style="color: #6B778C; font-size: 12px;">
+    Document Version: 1.0 | Last Updated: March 2026 | Author: Chef Platform Team
+</p>
+
+</body>
+</html>

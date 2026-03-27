@@ -18,7 +18,7 @@ Foodcritic was deprecated in 2019 and is no longer maintained. This project migr
 foodcritic_cookstyle_convert/
 ├── Jenkinsfile                    # Dynamic pipeline with cookbook selection
 ├── cookbooks/
-│   ├── b-foodcritic-rules/        # Custom BARC Cookstyle cops
+│   ├── b-cookstyle-rules/        # Custom BARC Cookstyle cops
 │   │   └── lib/rubocop/cop/barclays/
 │   ├── my-app-cookbook/           # Demo cookbook with VIOLATIONS
 │   └── compliant-cookbook/        # Demo cookbook that PASSES
@@ -82,7 +82,7 @@ Each cookbook includes a `.rubocop.yml` that loads the BARC rules:
 
 ```yaml
 require:
-  - ../b-foodcritic-rules/lib/rubocop-barclays
+  - ../b-cookstyle-rules/lib/rubocop-barclays
 
 AllCops:
   TargetChefVersion: 18.0
@@ -159,7 +159,7 @@ Reports are archived and accessible via Jenkins build artifacts.
 
 ## Contributing
 
-1. Add new cops to `cookbooks/b-foodcritic-rules/lib/rubocop/cop/barclays/`
+1. Add new cops to `cookbooks/b-cookstyle-rules/lib/rubocop/cop/barclays/`
 2. Register in `rubocop-barclays.rb`
 3. Add test cases to `my-app-cookbook/recipes/violations.rb`
 4. Run pipeline to verify detection

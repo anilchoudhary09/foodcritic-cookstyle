@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cookstyle Workflow with Barclays Cops - Flow Diagram</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #172B4D; max-width: 1400px; margin: 0 auto; padding: 20px; }
+        h1 { color: #0052CC; border-bottom: 3px solid #0052CC; padding-bottom: 10px; text-align: center; }
+        h2 { color: #172B4D; border-bottom: 2px solid #DFE1E6; padding-bottom: 8px; margin-top: 40px; }
+        h3 { color: #42526E; margin-top: 25px; }
+        .diagram-container { background: #FAFBFC; border: 2px solid #DFE1E6; border-radius: 8px; padding: 20px; margin: 20px 0; overflow-x: auto; }
+        .flow-diagram { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; white-space: pre; line-height: 1.4; }
+        .phase-header { background: linear-gradient(135deg, #0052CC, #0065FF); color: white; padding: 15px 25px; border-radius: 8px 8px 0 0; font-size: 18px; font-weight: bold; }
+        .phase-content { background: white; border: 2px solid #0052CC; border-top: none; border-radius: 0 0 8px 8px; padding: 25px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th { background-color: #0052CC; color: white; padding: 12px 15px; text-align: left; }
+        td { border: 1px solid #DFE1E6; padding: 10px 15px; }
+        tr:nth-child(even) { background-color: #F4F5F7; }
+        code { background-color: #F4F5F7; padding: 2px 6px; border-radius: 3px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; color: #172B4D; }
+        pre { background-color: #172B4D; color: #B3BAC5; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 13px; }
+        pre code { background-color: transparent; color: #B3BAC5; padding: 0; }
+        .info-box { background-color: #DEEBFF; border-left: 4px solid #0052CC; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .success-box { background-color: #E3FCEF; border-left: 4px solid #00875A; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .step-box { display: inline-block; background: linear-gradient(135deg, #0052CC, #0065FF); color: white; padding: 10px 20px; border-radius: 25px; margin: 5px; font-weight: bold; }
+        .arrow { color: #0052CC; font-size: 24px; margin: 0 10px; }
+        .step-flow { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; margin: 20px 0; }
+        .visual-flow { display: flex; justify-content: space-around; align-items: flex-start; flex-wrap: wrap; gap: 20px; margin: 30px 0; }
+        .flow-box { background: white; border: 2px solid #DFE1E6; border-radius: 8px; padding: 20px; min-width: 200px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .flow-box h4 { margin: 0 0 10px 0; color: #0052CC; }
+        .flow-box.phase1 { border-color: #00875A; }
+        .flow-box.phase1 h4 { color: #00875A; }
+        .flow-box.phase2 { border-color: #FF8B00; }
+        .flow-box.phase2 h4 { color: #FF8B00; }
+        .flow-box.phase3 { border-color: #6554C0; }
+        .flow-box.phase3 h4 { color: #6554C0; }
+        .connector { font-size: 30px; color: #6B778C; align-self: center; }
+        .mermaid-code { background: #2D3748; color: #E2E8F0; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 12px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+<h1>🔄 Cookstyle Workflow with Barclays Custom Cops</h1>
+
+<div class="info-box">
+    <strong>Purpose:</strong> This document provides visual flow diagrams showing the complete process from developer machine to CI/CD pipeline for using Cookstyle with Barclays custom BARC cops.
+</div>
+
+<!-- Visual Step Flow -->
+<h2>📋 High-Level Process Flow</h2>
+
+<div class="step-flow">
+    <span class="step-box">👨‍💻 Developer</span>
+    <span class="arrow">→</span>
+    <span class="step-box">💻 Local Test</span>
+    <span class="arrow">→</span>
+    <span class="step-box">📦 Git Push</span>
+    <span class="arrow">→</span>
+    <span class="step-box">🔧 Jenkins</span>
+    <span class="arrow">→</span>
+    <span class="step-box">📊 Reports</span>
+</div>
+
+<!-- Phase 1: Local Development -->
+<div style="margin-top: 40px;">
+    <div class="phase-header">🟢 PHASE 1: Local Development</div>
+    <div class="phase-content">
+        <div class="visual-flow">
+            <div class="flow-box phase1">
+                <h4>1. Clone Repo</h4>
+                <code>git clone b-cookstyle-rules</code>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase1">
+                <h4>2. Create/Edit Code</h4>
+                <p>recipes/default.rb<br>attributes/*.rb</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase1">
+                <h4>3. Run Cookstyle</h4>
+                <code>cookstyle .</code>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase1">
+                <h4>4. Fix & Push</h4>
+                <code>git commit && git push</code>
+            </div>
+        </div>
+
+        <h3>What Happens When You Run <code>cookstyle .</code></h3>
+        <div class="diagram-container">
+            <div class="flow-diagram">
+cookstyle .
+    │
+    ├──▶ Reads .rubocop.yml
+    │        │
+    │        └──▶ require: ./barc_cops.rb
+    │                    │
+    │                    └──▶ BarcRulesData.load_rules! reads rules.rb
+    │                              │
+    │                              ├── @restricted_services  (500+ exceptions)
+    │                              ├── @etc_whitelist        (200+ exceptions)
+    │                              ├── @etc_blacklist        (protected paths)
+    │                              └── @system_services      (protected services)
+    │
+    └──▶ Applies BARC001-BARC019 cops to your cookbook
+                │
+                └──▶ Reports violations (with exception handling)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Phase 2: CI/CD Pipeline -->
+<div style="margin-top: 40px;">
+    <div class="phase-header" style="background: linear-gradient(135deg, #FF8B00, #FFAB00);">🟠 PHASE 2: Jenkins CI/CD Pipeline</div>
+    <div class="phase-content">
+        <div class="visual-flow">
+            <div class="flow-box phase2">
+                <h4>1. Webhook Trigger</h4>
+                <p>GitHub notifies Jenkins</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase2">
+                <h4>2. Checkout</h4>
+                <p>Clone repository</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase2">
+                <h4>3. Setup</h4>
+                <p>Ruby + Cookstyle</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase2">
+                <h4>4. Run Cookstyle</h4>
+                <code>--format json</code>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase2">
+                <h4>5. Analyze</h4>
+                <p>Parse & Report</p>
+            </div>
+        </div>
+
+        <h3>Pipeline Decision Flow</h3>
+        <div class="diagram-container">
+            <div class="flow-diagram">
+                              ┌─────────────────────────────────┐
+                              │  cookstyle . --format json      │
+                              │  --out cookstyle-report.json    │
+                              └───────────────┬─────────────────┘
+                                              │
+                                              ▼
+                                      ┌──────────────┐
+                                      │  Violations  │
+                                      │   Found?     │
+                                      └──────┬───────┘
+                                             │
+                          ┌──────────────────┴──────────────────┐
+                          │                                     │
+                          ▼                                     ▼
+                   ┌─────────────┐                       ┌─────────────┐
+                   │    YES      │                       │     NO      │
+                   │  Violations │                       │   Clean!    │
+                   └──────┬──────┘                       └──────┬──────┘
+                          │                                     │
+                          ▼                                     ▼
+                ┌──────────────────┐                    ┌──────────────────┐
+                │ Generate HTML    │                    │  ✅ BUILD        │
+                │ Report           │                    │  SUCCESS         │
+                └────────┬─────────┘                    └──────────────────┘
+                         │
+                         ▼
+                ┌──────────────────┐
+                │ FAIL_ON_VIOLATIONS│
+                │    parameter?     │
+                └────────┬─────────┘
+                         │
+              ┌──────────┴──────────┐
+              │                     │
+              ▼                     ▼
+       ┌────────────┐        ┌────────────┐
+       │   true:    │        │   false:   │
+       │  ❌ FAIL   │        │  ⚠️ WARN   │
+       │   Build    │        │  Build OK  │
+       └────────────┘        └────────────┘
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Phase 3: Reports -->
+<div style="margin-top: 40px;">
+    <div class="phase-header" style="background: linear-gradient(135deg, #6554C0, #8777D9);">🟣 PHASE 3: Reports & Artifacts</div>
+    <div class="phase-content">
+        <div class="visual-flow">
+            <div class="flow-box phase3">
+                <h4>JSON Report</h4>
+                <p>cookstyle-report.json</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase3">
+                <h4>HTML Report</h4>
+                <p>Beautiful formatted report</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase3">
+                <h4>Jenkins Archive</h4>
+                <p>Artifacts stored</p>
+            </div>
+            <span class="connector">➜</span>
+            <div class="flow-box phase3">
+                <h4>Email Notification</h4>
+                <p>Team notified</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Relationships -->
+<h2>📁 File Relationships Diagram</h2>
+<div class="diagram-container">
+    <div class="flow-diagram">
+b-cookstyle-rules/
+│
+├── .rubocop.yml ─────────────────────┐
+│   │                                 │
+│   │  require: ./barc_cops.rb  ◀─────┤
+│   │                                 │
+│   └─ Cop configurations             │
+│      (enabled/disabled,             │
+│       severity levels)              │
+│                                     │
+├── barc_cops.rb ◀────────────────────┘
+│   │
+│   ├── module BarcRulesData
+│   │   │
+│   │   ├── load_rules! ─────────────────────┐
+│   │   │                                    │
+│   │   ├── service_whitelisted?()           │
+│   │   │                                    │
+│   │   └── etc_path_whitelisted?()          │
+│   │                                        │
+│   └── Cop Classes                          │
+│       ├── Barc001NoLocalUsers              │
+│       ├── Barc002NoLocalGroups             │
+│       ├── Barc005EtcBlacklist              │
+│       ├── Barc017NoSystemServices          │
+│       └── ... (12 total cops)              │
+│                                            │
+│                                            ▼
+├── rules.rb ─────────────────────────────────
+│   │
+│   │  2,800+ lines of exception data:
+│   │
+│   ├── @restricted_services = {
+│   │     'rsyslog' => ['cookbook1', ...],
+│   │     'docker'  => [],  # all allowed
+│   │   }
+│   │
+│   ├── @etc_whitelist = {
+│   │     '/etc/sudoers' => ['cookbook2'],
+│   │   }
+│   │
+│   ├── @etc_blacklist = [...]
+│   │
+│   └── @system_services = [...]
+│
+├── Rakefile ──────────── Pipeline tasks
+├── spec/ ────────────── RSpec tests
+└── Jenkinsfile ───────── Pipeline definition
+    </div>
+</div>
+
+<!-- Exception Logic -->
+<h2>🔒 Exception Checking Logic</h2>
+<div class="diagram-container">
+    <div class="flow-diagram">
+                          ┌──────────────────────┐
+                          │  Cookbook Resource   │
+                          │  e.g., service 'ntp' │
+                          └──────────┬───────────┘
+                                     │
+                                     ▼
+                          ┌──────────────────────┐
+                          │  BARC017 Cop Fires   │
+                          │  "System service     │
+                          │   management"        │
+                          └──────────┬───────────┘
+                                     │
+                                     ▼
+                    ┌────────────────────────────────────┐
+                    │  Is 'ntp' in @system_services?     │
+                    └────────────────┬───────────────────┘
+                                     │
+                      ┌──────────────┴──────────────┐
+                      │                             │
+                      ▼                             ▼
+                 ┌─────────┐                  ┌─────────┐
+                 │   NO    │                  │   YES   │
+                 └────┬────┘                  └────┬────┘
+                      │                            │
+                      ▼                            ▼
+               ┌────────────┐         ┌────────────────────────────┐
+               │  ✅ PASS   │         │  Check @restricted_services│
+               │  No issue  │         │  for exceptions            │
+               └────────────┘         └─────────────┬──────────────┘
+                                                    │
+                                      ┌─────────────┴─────────────┐
+                                      │                           │
+                                      ▼                           ▼
+                        ┌──────────────────────┐    ┌──────────────────────┐
+                        │ Cookbook in allowed  │    │ Cookbook NOT in      │
+                        │ list OR list empty   │    │ allowed list         │
+                        └──────────┬───────────┘    └──────────┬───────────┘
+                                   │                           │
+                                   ▼                           ▼
+                            ┌────────────┐              ┌────────────┐
+                            │  ✅ PASS   │              │  ❌ FAIL   │
+                            │  Exception │              │  Violation │
+                            │  Applied   │              │  Reported  │
+                            └────────────┘              └────────────┘
+    </div>
+</div>
+
+<div class="success-box">
+    <strong>Example:</strong><br>
+    <code>@restricted_services = { 'ntp' => ['is_platform_ntp_cookbook', 'is_base_config'] }</code><br><br>
+    <strong>my-app-cookbook</strong> trying to manage 'ntp' → ❌ VIOLATION (not in allowed list)<br>
+    <strong>is_platform_ntp_cookbook</strong> trying to manage 'ntp' → ✅ PASS (in allowed list)
+</div>
+
+<!-- BARC Cops Table -->
+<h2>👮 BARC Cops Summary</h2>
+<table>
+    <tr>
+        <th>Rule</th>
+        <th>Description</th>
+        <th>Exception Source</th>
+    </tr>
+    <tr>
+        <td><code>BARC001</code></td>
+        <td>Do not create local users</td>
+        <td>@platform_cookbook_whitelist</td>
+    </tr>
+    <tr>
+        <td><code>BARC002</code></td>
+        <td>Do not create local groups</td>
+        <td>@platform_cookbook_whitelist</td>
+    </tr>
+    <tr>
+        <td><code>BARC003</code></td>
+        <td>Do not modify root .ssh files</td>
+        <td>No exceptions</td>
+    </tr>
+    <tr>
+        <td><code>BARC005</code></td>
+        <td>Do not modify protected /etc paths</td>
+        <td>@etc_whitelist, @etc_blacklist</td>
+    </tr>
+    <tr>
+        <td><code>BARC006</code></td>
+        <td>Do not reboot/halt/shutdown</td>
+        <td>No exceptions</td>
+    </tr>
+    <tr>
+        <td><code>BARC007</code></td>
+        <td>Do not modify SELinux</td>
+        <td>No exceptions</td>
+    </tr>
+    <tr>
+        <td><code>BARC008</code></td>
+        <td>Do not kill processes</td>
+        <td>No exceptions</td>
+    </tr>
+    <tr>
+        <td><code>BARC009</code></td>
+        <td>Do not modify firewall</td>
+        <td>No exceptions</td>
+    </tr>
+    <tr>
+        <td><code>BARC011</code></td>
+        <td>No dangerous file removal</td>
+        <td>No exceptions</td>
+    </tr>
+    <tr>
+        <td><code>BARC016</code></td>
+        <td>Use Chef resources (not shell)</td>
+        <td>Convention only</td>
+    </tr>
+    <tr>
+        <td><code>BARC017</code></td>
+        <td>Do not manage system services</td>
+        <td>@system_services, @restricted_services</td>
+    </tr>
+    <tr>
+        <td><code>BARC019</code></td>
+        <td>No find/sudo/chmod 777</td>
+        <td>No exceptions</td>
+    </tr>
+</table>
+
+<!-- Quick Reference -->
+<h2>⚡ Quick Reference Commands</h2>
+<table>
+    <tr>
+        <th>Environment</th>
+        <th>Command</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td><strong>Local</strong></td>
+        <td><code>cookstyle .</code></td>
+        <td>Run all checks</td>
+    </tr>
+    <tr>
+        <td><strong>Local</strong></td>
+        <td><code>cookstyle . --only Barclays</code></td>
+        <td>Run only BARC cops</td>
+    </tr>
+    <tr>
+        <td><strong>Local</strong></td>
+        <td><code>cookstyle . --autocorrect</code></td>
+        <td>Auto-fix issues</td>
+    </tr>
+    <tr>
+        <td><strong>Jenkins</strong></td>
+        <td><code>cookstyle . --format json --out report.json</code></td>
+        <td>JSON output for pipeline</td>
+    </tr>
+    <tr>
+        <td><strong>Debug</strong></td>
+        <td><code>cookstyle . --debug</code></td>
+        <td>Verbose output</td>
+    </tr>
+</table>
+
+<!-- Mermaid Code Section -->
+<h2>📊 Mermaid Diagram Code (For Confluence)</h2>
+<div class="info-box">
+    <strong>To use in Confluence:</strong> Install the Mermaid macro, then paste this code directly.
+</div>
+
+<h3>Main Flow Diagram</h3>
+<div class="mermaid-code">
+<pre>
+flowchart TD
+    subgraph DEV["👨‍💻 Developer Machine"]
+        A[Clone b-cookstyle-rules repo] --> B[Create/Edit Cookbook]
+        B --> C{Run cookstyle locally}
+        C -->|Violations Found| D[Fix violations]
+        D --> C
+        C -->|Clean| E[git push to GitHub]
+    end
+
+    subgraph GITHUB["📦 GitHub Repository"]
+        E --> F[Webhook triggers Jenkins]
+    end
+
+    subgraph JENKINS["🔧 Jenkins Pipeline"]
+        F --> G[Checkout Code]
+        G --> H[Setup Environment]
+        H --> I[Load barc_cops.rb]
+        I --> J[barc_cops.rb reads rules.rb]
+        J --> K[Run cookstyle with BARC cops]
+        K --> L{Violations?}
+        L -->|Yes| M[Generate JSON Report]
+        L -->|No| N[✅ Build Success]
+        M --> O[Parse & Categorize Violations]
+        O --> P[Generate HTML Report]
+        P --> Q{FAIL_ON_VIOLATIONS?}
+        Q -->|true| R[❌ Build Failed]
+        Q -->|false| S[⚠️ Build Unstable]
+    end
+
+    subgraph REPORTS["📊 Reports & Artifacts"]
+        N --> T[Archive Artifacts]
+        R --> T
+        S --> T
+        T --> U[Publish HTML Report]
+        U --> V[Email Notification]
+    end
+
+    style DEV fill:#E3FCEF,stroke:#00875A
+    style GITHUB fill:#DEEBFF,stroke:#0052CC
+    style JENKINS fill:#FFFAE6,stroke:#FF8B00
+    style REPORTS fill:#F4F5F7,stroke:#6B778C
+</pre>
+</div>
+
+<h3>Sequence Diagram</h3>
+<div class="mermaid-code">
+<pre>
+sequenceDiagram
+    participant Dev as 👨‍💻 Developer
+    participant Local as 💻 Local Machine
+    participant Git as 📦 GitHub
+    participant Jenkins as 🔧 Jenkins
+    participant Cookstyle as 🔍 Cookstyle
+    participant Rules as 📋 rules.rb
+
+    Note over Dev,Rules: Development Phase
+    Dev->>Local: Clone repo & edit cookbook
+    Dev->>Local: Run: cookstyle .
+    Local->>Cookstyle: Load .rubocop.yml
+    Cookstyle->>Cookstyle: require './barc_cops.rb'
+    Cookstyle->>Rules: Read exceptions
+    Cookstyle-->>Local: Return violations
+    Dev->>Git: git push
+
+    Note over Dev,Rules: CI/CD Phase
+    Git->>Jenkins: Webhook trigger
+    Jenkins->>Cookstyle: cookstyle . --format json
+    Cookstyle->>Rules: Load exceptions
+    Cookstyle-->>Jenkins: JSON report
+    Jenkins->>Dev: Email notification
+</pre>
+</div>
+
+<hr>
+<p style="color: #6B778C; font-size: 12px; text-align: center;">
+    Document Version: 1.0 | Last Updated: March 2026 | Author: Chef Platform Team
+</p>
+
+</body>
+</html>

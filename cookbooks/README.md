@@ -6,14 +6,14 @@ This directory contains three cookbooks for the Foodcritic to Cookstyle migratio
 
 ```
 cookbooks/
-├── b-foodcritic-rules/      # Custom BARC Cookstyle cops library
+├── b-cookstyle-rules/      # Custom BARC Cookstyle cops library
 ├── my-app-cookbook/         # Demo cookbook with intentional violations
 └── compliant-cookbook/      # Demo cookbook following best practices
 ```
 
 ## Cookbooks
 
-### b-foodcritic-rules
+### b-cookstyle-rules
 
 The custom Cookstyle cops library containing 12 BARC security rules. This is not a runnable cookbook - it provides the RuboCop cops used by other cookbooks.
 
@@ -56,5 +56,5 @@ cookstyle . --format progress
 ## Adding New Cookbooks
 
 1. Copy the `.rubocop.yml` from an existing cookbook
-2. Ensure the path to `b-foodcritic-rules` is correct
+2. Ensure the path to `b-cookstyle-rules` is correct
 3. Run `cookstyle .` to validate

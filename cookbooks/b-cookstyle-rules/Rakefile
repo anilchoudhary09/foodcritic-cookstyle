@@ -52,7 +52,7 @@ task :changed_files do
                      'spec/regression/cookbooks-violator.txt',
                      'spec/regression/expected-output-regression.txt',
                      'spec/regression/expected-output-violator.txt']
-  changed_files = `git diff --name-only b-foodcritic-rules/#{ENV['GIT_TARGET_BRANCH']} #{ENV['GIT_TARGET_BRANCH']}`.split("\n")
+  changed_files = `git diff --name-only b-cookstyle-rules/#{ENV['GIT_TARGET_BRANCH']} #{ENV['GIT_TARGET_BRANCH']}`.split("\n")
   abort 'Failed to get changed files' unless $CHILD_STATUS.success?
   diff = changed_files - whitelist_files
   unless diff.empty?
@@ -70,7 +70,7 @@ end
 desc 'Output diff between current checkout foodcritic_ci branch and target branch'
 task :git_diff do
   puts "Output diff between current checkout foodcritic_ci branch and #{ENV['GIT_TARGET_BRANCH']} branch"
-  sh "git diff --no-color b-foodcritic-rules/#{ENV['GIT_TARGET_BRANCH']} #{ENV['GIT_TARGET_BRANCH']}"
+  sh "git diff --no-color b-cookstyle-rules/#{ENV['GIT_TARGET_BRANCH']} #{ENV['GIT_TARGET_BRANCH']}"
 end
 
 desc 'Update README and abort if changes need to be committed'

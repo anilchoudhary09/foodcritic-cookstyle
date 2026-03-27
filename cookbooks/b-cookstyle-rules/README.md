@@ -66,7 +66,7 @@ Running `cookstyle .` validates against:
 ## Directory Structure
 
 ```
-b-foodcritic-rules/
+b-cookstyle-rules/
 ├── .rubocop.yml              # Main config - loads custom cops
 ├── Gemfile                   # Dependencies (cookstyle)
 ├── rules.rb                  # Legacy Foodcritic rules (deprecated)
@@ -94,7 +94,7 @@ Copy `.rubocop.yml` to your cookbook and modify:
 ```yaml
 # your-cookbook/.rubocop.yml
 require:
-  - /path/to/b-foodcritic-rules/lib/rubocop/cop/barclays_cops
+  - /path/to/b-cookstyle-rules/lib/rubocop/cop/barclays_cops
 
 # Then run:
 # cookstyle .

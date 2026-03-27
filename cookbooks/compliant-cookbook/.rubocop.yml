@@ -1,9 +1,9 @@
 # Cookstyle Configuration for compliant-cookbook
 # This cookbook follows ALL Barclays security policies
-# Exceptions are defined in b-foodcritic-rules/rules.rb
+# Exceptions are defined in b-cookstyle-rules/rules.rb
 
 require:
-  - ../b-foodcritic-rules/barc_cops.rb
+  - ../b-cookstyle-rules/barc_cops.rb
 
 AllCops:
   TargetRubyVersion: 3.1

@@ -4,7 +4,7 @@
 # 1. Standard Cookstyle rules (200+ Chef best practices)
 # 2. Custom BARC rules (organization security policies)
 #
-# Exceptions are defined in b-foodcritic-rules/rules.rb
+# Exceptions are defined in b-cookstyle-rules/rules.rb
 #
 # Usage:
 #   cookstyle .                    # Run all checks
@@ -13,7 +13,7 @@
 
 # Load custom BARC cops (reads exceptions from rules.rb)
 require:
-  - ../b-foodcritic-rules/barc_cops.rb
+  - ../b-cookstyle-rules/barc_cops.rb
 
 AllCops:
   TargetRubyVersion: 3.1

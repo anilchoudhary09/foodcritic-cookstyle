@@ -1,4 +1,4 @@
-# b-foodcritic-rules - Custom Cookstyle Cops for Organization
+# b-cookstyle-rules - Custom Cookstyle Cops for Organization
 #
 # This configuration enables both:
 # 1. Standard Cookstyle rules (200+ Chef best practices)

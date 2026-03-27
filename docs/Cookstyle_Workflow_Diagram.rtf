@@ -1,0 +1,342 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;\f2\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green82\blue204;\red0\green135\blue90;\red255\green139\blue0;\red23\green43\blue77;}
+\paperw12240\paperh15840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs48 \cf2 Cookstyle Workflow with Barclays Custom Cops\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf5 Purpose: This document provides visual flow diagrams showing the complete process from developer machine to CI/CD pipeline for using Cookstyle with Barclays custom BARC cops.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 High-Level Process Flow\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf5 \
+[Developer] --> [Local Test] --> [Git Push] --> [Jenkins] --> [Reports]\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf3 PHASE 1: Local Development\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs20 \cf5 \
++----------------+     +----------------+     +----------------+     +----------------+\
+|   1. Clone     | --> |   2. Create/   | --> |   3. Run       | --> |   4. Commit &  |\
+|   Repo         |     |   Edit Code    |     |   cookstyle .  |     |   Push         |\
++----------------+     +----------------+     +----------------+     +----------------+\
+                                                     |\
+                                                     v\
+                                              +------------+\
+                                              | Violations |--> Fix & Re-run\
+                                              |  Found?    |\
+                                              +------------+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b \cf5 What Happens When You Run cookstyle:\
+\f1\b0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs20 \cf5 cookstyle .\
+    |\
+    +---> Reads .rubocop.yml\
+    |        |\
+    |        +---> require: ./barc_cops.rb\
+    |                    |\
+    |                    +---> BarcRulesData.load_rules! reads rules.rb\
+    |                              |\
+    |                              +-- @restricted_services  (500+ exceptions)\
+    |                              +-- @etc_whitelist        (200+ exceptions)\
+    |                              +-- @etc_blacklist        (protected paths)\
+    |                              +-- @system_services      (protected services)\
+    |\
+    +---> Applies BARC001-BARC019 cops to your cookbook\
+                |\
+                +---> Reports violations (with exception handling)\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf4 PHASE 2: Jenkins CI/CD Pipeline\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs20 \cf5 \
+GitHub                        Jenkins EC2\
++--------------+              +---------------------------------------------------+\
+|              |   Webhook    |                                                   |\
+|  Push Event  |------------->|  [Checkout] --> [Setup] --> [Load Cops] --> [Run] |\
+|              |              |      Code        Ruby                    Cookstyle|\
+|  main branch |              +-------------------+-------------------------------+\
+|              |                                  |\
++--------------+                                  v\
+                                          +-------------+\
+                                          | Violations  |\
+                                          |   Found?    |\
+                                          +------+------+\
+                                                 |\
+                              +------------------+------------------+\
+                              |                                     |\
+                              v                                     v\
+                       +------------+                        +------------+\
+                       |    YES     |                        |     NO     |\
+                       | Violations |                        |   Clean!   |\
+                       +-----+------+                        +-----+------+\
+                             |                                     |\
+                             v                                     v\
+                    +----------------+                    +----------------+\
+                    | Generate HTML  |                    |  BUILD SUCCESS |\
+                    | Report         |                    +----------------+\
+                    +-------+--------+\
+                            |\
+                            v\
+                   +------------------+\
+                   |FAIL_ON_VIOLATIONS|\
+                   |    parameter?    |\
+                   +--------+---------+\
+                            |\
+              +-------------+-------------+\
+              |                           |\
+              v                           v\
+       +------------+              +------------+\
+       |   true:    |              |   false:   |\
+       | BUILD FAIL |              |  BUILD OK  |\
+       +------------+              | (Unstable) |\
+                                   +------------+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 PHASE 3: Reports & Artifacts\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs20 \cf5 \
++---------------+     +---------------+     +---------------+     +---------------+\
+| JSON Report   | --> | HTML Report   | --> | Jenkins       | --> | Email         |\
+| cookstyle-    |     | Beautiful     |     | Archive       |     | Notification  |\
+| report.json   |     | formatted     |     | Artifacts     |     | to team       |\
++---------------+     +---------------+     +---------------+     +---------------+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 File Relationships Diagram\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs20 \cf5 b-cookstyle-rules/\
+|\
++-- .rubocop.yml ----------------------+\
+|   |                                  |\
+|   |  require: ./barc_cops.rb  <------+\
+|   |                                  |\
+|   +- Cop configurations              |\
+|      (enabled/disabled,              |\
+|       severity levels)               |\
+|                                      |\
++-- barc_cops.rb <---------------------+\
+|   |\
+|   +-- module BarcRulesData\
+|   |   |\
+|   |   +-- load_rules! -------------------+\
+|   |   |                                  |\
+|   |   +-- service_whitelisted?()         |\
+|   |   |                                  |\
+|   |   +-- etc_path_whitelisted?()        |\
+|   |                                      |\
+|   +-- Cop Classes                        |\
+|       +-- Barc001NoLocalUsers            |\
+|       +-- Barc002NoLocalGroups           |\
+|       +-- Barc005EtcBlacklist            |\
+|       +-- Barc017NoSystemServices        |\
+|       +-- ... (12 total cops)            |\
+|                                          |\
+|                                          v\
++-- rules.rb ------------------------------+\
+|   |\
+|   |  2,800+ lines of exception data:\
+|   |\
+|   +-- @restricted_services = \{\
+|   |     'rsyslog' => ['cookbook1', ...],\
+|   |     'docker'  => [],  # all allowed\
+|   |   \}\
+|   |\
+|   +-- @etc_whitelist = \{\
+|   |     '/etc/sudoers' => ['cookbook2'],\
+|   |   \}\
+|   |\
+|   +-- @etc_blacklist = [...]\
+|   |\
+|   +-- @system_services = [...]\
+|\
++-- Rakefile ------------ Pipeline tasks\
++-- spec/ --------------- RSpec tests\
++-- Jenkinsfile --------- Pipeline definition\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 Exception Checking Logic\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs20 \cf5 \
+                          +----------------------+\
+                          |  Cookbook Resource   |\
+                          |  e.g., service 'ntp' |\
+                          +----------+-----------+\
+                                     |\
+                                     v\
+                          +----------------------+\
+                          |  BARC017 Cop Fires   |\
+                          |  "System service     |\
+                          |   management"        |\
+                          +----------+-----------+\
+                                     |\
+                                     v\
+                    +------------------------------------+\
+                    |  Is 'ntp' in @system_services?     |\
+                    +----------------+-------------------+\
+                                     |\
+                      +--------------+--------------+\
+                      |                             |\
+                      v                             v\
+                 +---------+                  +---------+\
+                 |   NO    |                  |   YES   |\
+                 +----+----+                  +----+----+\
+                      |                            |\
+                      v                            v\
+               +------------+         +----------------------------+\
+               |  [PASS]    |         |  Check @restricted_services|\
+               |  No issue  |         |  for exceptions            |\
+               +------------+         +-------------+--------------+\
+                                                    |\
+                                      +-------------+-------------+\
+                                      |                           |\
+                                      v                           v\
+                        +----------------------+    +----------------------+\
+                        | Cookbook in allowed  |    | Cookbook NOT in      |\
+                        | list OR list empty   |    | allowed list         |\
+                        +----------+-----------+    +----------+-----------+\
+                                   |                           |\
+                                   v                           v\
+                            +------------+              +------------+\
+                            |  [PASS]    |              |  [FAIL]    |\
+                            |  Exception |              |  Violation |\
+                            |  Applied   |              |  Reported  |\
+                            +------------+              +------------+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b \cf3 Example:\
+\f1\b0 \cf5 @restricted_services = \{ 'ntp' => ['is_platform_ntp_cookbook', 'is_base_config'] \}\
+\
+- my-app-cookbook trying to manage 'ntp' --> [FAIL] VIOLATION (not in allowed list)\
+- is_platform_ntp_cookbook trying to manage 'ntp' --> [PASS] (in allowed list)\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 BARC Cops Summary\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf5 \
+RULE      | DESCRIPTION                            | EXCEPTION SOURCE\
+----------|----------------------------------------|---------------------------\
+BARC001   | Do not create local users              | @platform_cookbook_whitelist\
+BARC002   | Do not create local groups             | @platform_cookbook_whitelist\
+BARC003   | Do not modify root .ssh files          | No exceptions\
+BARC005   | Do not modify protected /etc paths     | @etc_whitelist, @etc_blacklist\
+BARC006   | Do not reboot/halt/shutdown            | No exceptions\
+BARC007   | Do not modify SELinux                  | No exceptions\
+BARC008   | Do not kill processes                  | No exceptions\
+BARC009   | Do not modify firewall                 | No exceptions\
+BARC011   | No dangerous file removal              | No exceptions\
+BARC016   | Use Chef resources (not shell)         | Convention only\
+BARC017   | Do not manage system services          | @system_services, @restricted_services\
+BARC019   | No find/sudo/chmod 777                 | No exceptions\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 Quick Reference Commands\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf5 \
+ENVIRONMENT | COMMAND                                        | PURPOSE\
+------------|------------------------------------------------|-----------------------\
+Local       | cookstyle .                                    | Run all checks\
+Local       | cookstyle . --only Barclays                    | Run only BARC cops\
+Local       | cookstyle . --autocorrect                      | Auto-fix issues\
+Jenkins     | cookstyle . --format json --out report.json    | JSON output for pipeline\
+Debug       | cookstyle . --debug                            | Verbose output\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf2 Mermaid Diagram Code (For Confluence)\
+\f1\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf5 To use in Confluence: Install the Mermaid macro, then paste this code directly.\
+\
+
+\f0\b Main Flow Diagram:\
+\f1\b0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\fs18 \cf5 flowchart TD\
+    subgraph DEV["Developer Machine"]\
+        A[Clone b-cookstyle-rules repo] --> B[Create/Edit Cookbook]\
+        B --> C\{Run cookstyle locally\}\
+        C -->|Violations Found| D[Fix violations]\
+        D --> C\
+        C -->|Clean| E[git push to GitHub]\
+    end\
+\
+    subgraph GITHUB["GitHub Repository"]\
+        E --> F[Webhook triggers Jenkins]\
+    end\
+\
+    subgraph JENKINS["Jenkins Pipeline"]\
+        F --> G[Checkout Code]\
+        G --> H[Setup Environment]\
+        H --> I[Load barc_cops.rb]\
+        I --> J[barc_cops.rb reads rules.rb]\
+        J --> K[Run cookstyle with BARC cops]\
+        K --> L\{Violations?\}\
+        L -->|Yes| M[Generate JSON Report]\
+        L -->|No| N[Build Success]\
+        M --> O[Parse & Categorize Violations]\
+        O --> P[Generate HTML Report]\
+        P --> Q\{FAIL_ON_VIOLATIONS?\}\
+        Q -->|true| R[Build Failed]\
+        Q -->|false| S[Build Unstable]\
+    end\
+\
+    subgraph REPORTS["Reports & Artifacts"]\
+        N --> T[Archive Artifacts]\
+        R --> T\
+        S --> T\
+        T --> U[Publish HTML Report]\
+        U --> V[Email Notification]\
+    end\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf5 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b \cf5 ---\
+
+\f1\b0 Document Version: 1.0 | Last Updated: March 2026 | Author: Chef Platform Team\
+}

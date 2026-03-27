@@ -59,11 +59,8 @@ pipeline {
 
                         cd ${cookbookPath}
 
-                        # Run cookstyle with centralized BARC rules config
-                        # No need for .rubocop.yml in each cookbook!
+                        # Run cookstyle - BARC rules loaded via .rubocop.yml inherit_from
                         cookstyle . \\
-                            --require ../b-cookstyle-rules/barc_cops.rb \\
-                            --config ../b-cookstyle-rules/.rubocop.yml \\
                             --format progress \\
                             --format json --out cookstyle-report.json || true
 

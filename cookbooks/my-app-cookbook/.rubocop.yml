@@ -1,0 +1,2 @@
+# Inherit all Cookstyle + BARC rules from central config
+inherit_from: ../b-cookstyle-rules/.rubocop.yml

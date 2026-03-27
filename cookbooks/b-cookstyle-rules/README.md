@@ -89,16 +89,25 @@ b-cookstyle-rules/
 
 ## Using in Your Cookbook
 
-Copy `.rubocop.yml` to your cookbook and modify:
+**Step 1:** Add this minimal `.rubocop.yml` to your cookbook (just 2 lines!):
 
 ```yaml
 # your-cookbook/.rubocop.yml
-require:
-  - /path/to/b-cookstyle-rules/lib/rubocop/cop/barclays_cops
-
-# Then run:
-# cookstyle .
+inherit_from: ../b-cookstyle-rules/.rubocop.yml
 ```
+
+**Step 2:** Run cookstyle:
+
+```bash
+cookstyle .                    # Run all checks
+cookstyle . --autocorrect      # Auto-fix issues
+cookstyle . --format json      # JSON output for CI/CD
+```
+
+That's it! This single line loads:
+- ✅ All 200+ Cookstyle Chef best practices
+- ✅ All BARC001-BARC019 security rules  
+- ✅ Exception handling from rules.rb
 
 ## CI/CD Integration (Jenkins)
 

@@ -1,0 +1,74 @@
+# Test Kitchen Configuration for Chef 19 Compatibility Testing
+#
+# This config tests cookbook convergence on RHEL with Chef Client 19
+#
+# Usage:
+#   kitchen list                    # List all instances
+#   kitchen converge                # Run converge on all instances
+#   kitchen converge rhel-9         # Converge specific instance
+#   kitchen verify                  # Run InSpec tests
+#   kitchen destroy                 # Clean up instances
+#   kitchen test                    # Full cycle: create, converge, verify, destroy
+
+---
+driver:
+  name: docker
+  privileged: true
+  use_sudo: false
+
+provisioner:
+  name: chef_infra
+  product_name: chef
+  product_version: 19           # Chef Client 19 for compatibility testing
+  chef_license: accept-silent
+  log_level: info
+  always_update_cookbooks: true
+
+verifier:
+  name: inspec
+
+transport:
+  name: docker
+
+platforms:
+  # RHEL 9 (Primary)
+  - name: rhel-9
+    driver:
+      image: redhat/ubi9:latest
+      platform: rhel
+      run_command: /usr/sbin/init
+      cap_add:
+        - SYS_ADMIN
+      volume:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  # RHEL 8
+  - name: rhel-8
+    driver:
+      image: redhat/ubi8:latest
+      platform: rhel
+      run_command: /usr/sbin/init
+      cap_add:
+        - SYS_ADMIN
+      volume:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  # Rocky Linux 9 (RHEL-compatible alternative)
+  - name: rocky-9
+    driver:
+      image: rockylinux:9
+      platform: rhel
+      run_command: /usr/sbin/init
+      cap_add:
+        - SYS_ADMIN
+      volume:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+suites:
+  - name: default
+    run_list:
+      - recipe[compliant-cookbook::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:

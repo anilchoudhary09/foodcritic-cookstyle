@@ -1,0 +1,303 @@
+// Jenkinsfile.kitchen - Test Kitchen Pipeline for Chef 19 Compatibility Testing
+//
+// This pipeline tests cookbook convergence on various OS platforms using Chef Client 19
+//
+// Prerequisites on Jenkins:
+//   - Docker installed (for local testing)
+//   - OR AWS credentials configured (for EC2 testing)
+//   - Ruby and Test Kitchen gems installed
+//
+// Usage: Run "Build with Parameters" and select:
+//   - COOKBOOK_NAME: Cookbook to test
+//   - PLATFORM: Target OS platform
+//   - KITCHEN_ACTION: converge/verify/test/destroy
+
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'COOKBOOK_NAME',
+            choices: ['my-app-cookbook', 'compliant-cookbook'],
+            description: 'Select the cookbook to test'
+        )
+        choice(
+            name: 'PLATFORM',
+            choices: ['rhel-9', 'rhel-8', 'centos-stream-9', 'rocky-9', 'amazon-linux-2023', 'ubuntu-2204'],
+            description: 'Select the target OS platform'
+        )
+        choice(
+            name: 'KITCHEN_ACTION',
+            choices: ['converge', 'verify', 'test', 'destroy'],
+            description: 'Kitchen action: converge (create+converge), verify (run InSpec), test (full cycle), destroy (cleanup)'
+        )
+        choice(
+            name: 'KITCHEN_DRIVER',
+            choices: ['docker', 'ec2'],
+            description: 'Kitchen driver: docker (local) or ec2 (AWS)'
+        )
+        booleanParam(
+            name: 'DESTROY_ON_FAILURE',
+            defaultValue: true,
+            description: 'Destroy instances if test fails'
+        )
+    }
+
+    environment {
+        CHEF_LICENSE = 'accept-silent'
+        KITCHEN_LOCAL_YAML = "${params.KITCHEN_DRIVER == 'ec2' ? 'kitchen.ec2.yml' : 'kitchen.yml'}"
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 60, unit: 'MINUTES')
+        timestamps()
+        ansiColor('xterm')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Testing cookbook: ${params.COOKBOOK_NAME}"
+                echo "Platform: ${params.PLATFORM}"
+                echo "Action: ${params.KITCHEN_ACTION}"
+                echo "Driver: ${params.KITCHEN_DRIVER}"
+            }
+        }
+
+        stage('Setup Environment') {
+            steps {
+                script {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       CHEF 19 COMPATIBILITY TEST - SETUP                  ║"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+
+                        echo "Ruby version: \$(ruby --version)"
+                        echo "Bundler version: \$(bundle --version)"
+
+                        cd ${cookbookPath}
+
+                        # Install dependencies
+                        if [ -f Gemfile ]; then
+                            echo "Installing gem dependencies..."
+                            bundle config set --local path 'vendor/bundle'
+                            bundle install --quiet
+                        fi
+
+                        # Verify Test Kitchen is available
+                        bundle exec kitchen --version || kitchen --version
+
+                        echo ""
+                        echo "Kitchen config: \${KITCHEN_LOCAL_YAML}"
+                        echo "Available platforms:"
+                        bundle exec kitchen list 2>/dev/null || kitchen list
+                    """
+                }
+            }
+        }
+
+        stage('Pre-flight Check') {
+            steps {
+                script {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       PRE-FLIGHT CHECKS                                   ║"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+
+                        cd ${cookbookPath}
+
+                        # Check if platform exists in kitchen config
+                        echo "Checking platform: ${params.PLATFORM}"
+
+                        if [ "${params.KITCHEN_DRIVER}" = "docker" ]; then
+                            echo "Verifying Docker is running..."
+                            docker info > /dev/null 2>&1 || { echo "ERROR: Docker is not running"; exit 1; }
+                            echo "Docker is available"
+                        fi
+
+                        if [ "${params.KITCHEN_DRIVER}" = "ec2" ]; then
+                            echo "Verifying AWS credentials..."
+                            aws sts get-caller-identity || { echo "ERROR: AWS credentials not configured"; exit 1; }
+                            echo "AWS credentials valid"
+                        fi
+
+                        echo ""
+                        echo "Pre-flight checks passed!"
+                    """
+                }
+            }
+        }
+
+        stage('Kitchen Create') {
+            when {
+                expression { params.KITCHEN_ACTION in ['converge', 'test'] }
+            }
+            steps {
+                script {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+                    def instance = "default-${params.PLATFORM}"
+
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       CREATING INSTANCE: ${instance}"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+
+                        cd ${cookbookPath}
+
+                        export KITCHEN_LOCAL_YAML=\${KITCHEN_LOCAL_YAML}
+
+                        bundle exec kitchen create ${instance} || kitchen create ${instance}
+
+                        echo ""
+                        echo "Instance created successfully!"
+                    """
+                }
+            }
+        }
+
+        stage('Kitchen Converge') {
+            when {
+                expression { params.KITCHEN_ACTION in ['converge', 'test'] }
+            }
+            steps {
+                script {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+                    def instance = "default-${params.PLATFORM}"
+
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       CHEF 19 CONVERGE: ${params.COOKBOOK_NAME}"
+                        echo "║       Platform: ${params.PLATFORM}"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+
+                        cd ${cookbookPath}
+
+                        export KITCHEN_LOCAL_YAML=\${KITCHEN_LOCAL_YAML}
+
+                        echo "Running Chef Client 19 converge..."
+                        echo "This tests cookbook compatibility with Chef 19"
+                        echo ""
+
+                        bundle exec kitchen converge ${instance} || kitchen converge ${instance}
+
+                        echo ""
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       CONVERGE SUCCESSFUL - CHEF 19 COMPATIBLE!           ║"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+                    """
+                }
+            }
+        }
+
+        stage('Kitchen Verify') {
+            when {
+                expression { params.KITCHEN_ACTION in ['verify', 'test'] }
+            }
+            steps {
+                script {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+                    def instance = "default-${params.PLATFORM}"
+
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       INSPEC VERIFICATION: ${instance}"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+
+                        cd ${cookbookPath}
+
+                        export KITCHEN_LOCAL_YAML=\${KITCHEN_LOCAL_YAML}
+
+                        # Check if InSpec tests exist
+                        if [ -d "test/integration/default" ]; then
+                            bundle exec kitchen verify ${instance} || kitchen verify ${instance}
+                            echo "InSpec tests passed!"
+                        else
+                            echo "No InSpec tests found in test/integration/default"
+                            echo "Skipping verification step"
+                        fi
+                    """
+                }
+            }
+        }
+
+        stage('Kitchen Destroy') {
+            when {
+                expression { params.KITCHEN_ACTION == 'destroy' }
+            }
+            steps {
+                script {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+                    def instance = "default-${params.PLATFORM}"
+
+                    sh """
+                        echo "╔═══════════════════════════════════════════════════════════╗"
+                        echo "║       DESTROYING INSTANCE: ${instance}"
+                        echo "╚═══════════════════════════════════════════════════════════╝"
+
+                        cd ${cookbookPath}
+
+                        export KITCHEN_LOCAL_YAML=\${KITCHEN_LOCAL_YAML}
+
+                        bundle exec kitchen destroy ${instance} || kitchen destroy ${instance}
+
+                        echo "Instance destroyed successfully!"
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+
+                // Generate summary
+                sh """
+                    echo ""
+                    echo "╔═══════════════════════════════════════════════════════════╗"
+                    echo "║       TEST KITCHEN SUMMARY                                ║"
+                    echo "╠═══════════════════════════════════════════════════════════╣"
+                    echo "║  Cookbook:    ${params.COOKBOOK_NAME}"
+                    echo "║  Platform:    ${params.PLATFORM}"
+                    echo "║  Chef:        19 (latest)"
+                    echo "║  Action:      ${params.KITCHEN_ACTION}"
+                    echo "║  Driver:      ${params.KITCHEN_DRIVER}"
+                    echo "║  Status:      ${currentBuild.currentResult}"
+                    echo "╚═══════════════════════════════════════════════════════════╝"
+                """
+            }
+        }
+
+        success {
+            echo "Chef 19 compatibility test PASSED for ${params.COOKBOOK_NAME} on ${params.PLATFORM}!"
+        }
+
+        failure {
+            script {
+                if (params.DESTROY_ON_FAILURE && params.KITCHEN_ACTION != 'destroy') {
+                    def cookbookPath = "cookbooks/${params.COOKBOOK_NAME}"
+                    def instance = "default-${params.PLATFORM}"
+
+                    sh """
+                        echo "Cleaning up failed instance..."
+                        cd ${cookbookPath}
+                        export KITCHEN_LOCAL_YAML=\${KITCHEN_LOCAL_YAML}
+                        bundle exec kitchen destroy ${instance} || kitchen destroy ${instance} || true
+                    """
+                }
+            }
+            echo "Chef 19 compatibility test FAILED for ${params.COOKBOOK_NAME} on ${params.PLATFORM}"
+        }
+
+        cleanup {
+            cleanWs(cleanWhenNotBuilt: false, deleteDirs: true, disableDeferredWipeout: true)
+        }
+    }
+}

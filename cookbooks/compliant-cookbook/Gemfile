@@ -2,4 +2,18 @@
 
 source 'https://rubygems.org'
 
+# Linting
 gem 'cookstyle', '~> 7.32'
+
+# Test Kitchen for Chef 19 Compatibility Testing
+gem 'test-kitchen', '~> 3.6'
+gem 'kitchen-docker', '~> 2.13'    # Docker driver for local testing
+gem 'kitchen-inspec', '~> 2.6'     # InSpec verifier
+gem 'kitchen-ec2', '~> 3.19'       # EC2 driver for AWS testing (optional)
+
+# Chef development
+gem 'chef', '~> 19.0'              # Chef 19 for local testing
+gem 'berkshelf', '~> 8.0'          # Dependency management
+
+# InSpec for compliance testing
+gem 'inspec', '~> 6.0'

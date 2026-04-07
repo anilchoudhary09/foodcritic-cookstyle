@@ -89,24 +89,25 @@ b-cookstyle-rules/
 
 ## Using in Your Cookbook
 
-**Step 1:** Add this minimal `.rubocop.yml` to your cookbook (just 2 lines!):
-
-```yaml
-# your-cookbook/.rubocop.yml
-inherit_from: ../b-cookstyle-rules/.rubocop.yml
-```
-
-**Step 2:** Run cookstyle:
+**No `.rubocop.yml` needed!** Just run cookstyle with `--config` flag:
 
 ```bash
-cookstyle .                    # Run all checks
-cookstyle . --autocorrect      # Auto-fix issues
-cookstyle . --format json      # JSON output for CI/CD
+# From your cookbook directory
+cookstyle . --config ../b-cookstyle-rules/.rubocop.yml
+
+# With auto-fix
+cookstyle . --config ../b-cookstyle-rules/.rubocop.yml --autocorrect
+
+# JSON output for CI/CD
+cookstyle . --config ../b-cookstyle-rules/.rubocop.yml --format json --out report.json
+
+# From anywhere (absolute path)
+cookstyle /path/to/cookbook --config /path/to/b-cookstyle-rules/.rubocop.yml
 ```
 
-That's it! This single line loads:
+This loads:
 - ✅ All 200+ Cookstyle Chef best practices
-- ✅ All BARC001-BARC019 security rules  
+- ✅ All BARC001-BARC019 security rules
 - ✅ Exception handling from rules.rb
 
 ## CI/CD Integration (Jenkins)
@@ -117,14 +118,13 @@ pipeline {
     stages {
         stage('Lint') {
             steps {
-                sh 'bundle install'
-                sh 'bundle exec cookstyle . --format json --out cookstyle-report.json'
+                sh 'cookstyle cookbooks/${COOKBOOK} --config cookbooks/b-cookstyle-rules/.rubocop.yml --format json --out report.json'
             }
         }
     }
     post {
         always {
-            archiveArtifacts artifacts: 'cookstyle-report.json'
+            archiveArtifacts artifacts: 'report.json'
         }
     }
 }

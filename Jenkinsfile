@@ -12,7 +12,7 @@ pipeline {
     parameters {
         choice(
             name: 'COOKBOOK_NAME',
-            choices: ['my-app-cookbook', 'compliant-cookbook'],
+            choices: ['my-app-cookbook', 'compliant-cookbook', 'complaint-cookbook', 'comprehensive_test_cookbook', 'bad_cookbook', 'is_uisec_unix_sudo', 'mysql'],
             description: 'Select the cookbook to validate with Cookstyle'
         )
         booleanParam(

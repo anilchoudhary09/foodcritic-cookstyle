@@ -1,5 +1,11 @@
 name 'complaint-cookbook'
 version '1.0.0'
-maintainer 'Barclays'
+maintainer 'Barclays Chef Team'
+maintainer_email 'chef-team@barclays.com'
 license 'Apache-2.0'
-description 'A compliant cookbook that follows all BARC rules'
+description 'A test cookbook with BARC rule violations for testing'
+source_url 'https://github.com/barclays/complaint-cookbook'
+
+supports 'redhat'
+supports 'centos'
+supports 'windows'

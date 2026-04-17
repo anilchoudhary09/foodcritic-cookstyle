@@ -1,149 +1,173 @@
-# b-cookstyle-rules - Custom Cookstyle Cops for Organization
+# b-cookstyle-rules - Minimal Cookstyle + BARC Rules Configuration
 #
-# This configuration enables both:
-# 1. Standard Cookstyle rules (200+ Chef best practices)
-# 2. Custom BARC rules (organization security policies)
+# Usage: cookstyle <cookbook> --config cookbooks/b-cookstyle-rules/.rubocop.yml
 #
-# Exceptions are loaded from rules.rb (same format as original Foodcritic rules)
-#
-# Usage:
-#   cookstyle .                    # Run all checks
-#   cookstyle --autocorrect .      # Auto-fix where possible
-#   cookstyle --format json .      # JSON output for CI/CD
-#
-# To check a specific cookbook:
-#   cookstyle /path/to/cookbook
+# This config:
+#   - Uses ALL standard Cookstyle cops (default)
+#   - Adds ALL BARC security rules (BARC001-036) from barc_cops.rb
+#   - All BARC exceptions managed in rules.rb only
 
-inherit_from: .rubocop_todo.yml
-
-# Load custom BARC cops (reads exceptions from rules.rb)
 require:
   - ./barc_cops.rb
 
 AllCops:
-  TargetRubyVersion: 3.1
   NewCops: enable
-  SuggestExtensions: false
-  DisplayCopNames: true
-  DisplayStyleGuide: true
-  ExtraDetails: true
-
-  # Chef cookbook files
-  Include:
-    - '**/*.rb'
-    - '**/metadata.rb'
-    - '**/Berksfile'
-    - '**/Policyfile.rb'
-
-  # Exclude non-cookbook files
   Exclude:
-    - 'vendor/**/*'
-    - 'test/fixtures/**/*'
-    - 'spec/fixtures/**/*'
-    - 'tmp/**/*'
-    - 'node_modules/**/*'
-    - 'rules.rb'  # Exclude old Foodcritic rules file
+    - "vendor/**/*"
+    - "rules.rb"
+    - ".rubocop.yml"
 
-# ============================================================
-# BARCLAYS CUSTOM SECURITY RULES (BARC001-BARC019)
-# ============================================================
-
+# BARC Security Rules (001-020)
 Barclays/Barc001NoLocalUsers:
-  Description: 'Prohibits local user manipulation - use centralized identity management'
   Enabled: true
   Severity: error
 
 Barclays/Barc002NoLocalGroups:
-  Description: 'Prohibits local group manipulation - use centralized identity management'
   Enabled: true
   Severity: error
 
 Barclays/Barc003NoRootSsh:
-  Description: 'Prohibits root .ssh directory manipulation'
+  Enabled: true
+  Severity: error
+
+Barclays/Barc004NoSshKeys:
   Enabled: true
   Severity: error
 
 Barclays/Barc005EtcBlacklist:
-  Description: 'Enforces /etc directory blacklist for protected system files'
+  Enabled: true
+  Severity: error
+
+Barclays/Barc005aEtcBlacklistAttributes:
   Enabled: true
   Severity: error
 
 Barclays/Barc006NoReboot:
-  Description: 'Prohibits reboot/shutdown commands in cookbooks'
   Enabled: true
   Severity: error
 
 Barclays/Barc007NoSelinux:
-  Description: 'Prohibits SELinux manipulation - managed by security team'
   Enabled: true
   Severity: error
 
 Barclays/Barc008NoKillProcess:
-  Description: 'Prohibits kill and process priority manipulation'
   Enabled: true
   Severity: warning
 
 Barclays/Barc009NoFirewall:
-  Description: 'Prohibits firewall manipulation - managed by network team'
+  Enabled: true
+  Severity: error
+
+Barclays/Barc010NoInit:
   Enabled: true
   Severity: error
 
 Barclays/Barc011NoRemoveFiles:
-  Description: 'Prohibits dangerous file/directory removal patterns'
   Enabled: true
   Severity: warning
 
+Barclays/Barc012NoKernel:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc013NoVolume:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc014NoNetwork:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc015NoRootCron:
+  Enabled: true
+  Severity: error
+
 Barclays/Barc016UseChefResources:
-  Description: 'Recommends Chef resources instead of shell commands'
   Enabled: true
   Severity: convention
 
 Barclays/Barc017NoSystemServices:
-  Description: 'Prohibits manipulation of protected system services'
   Enabled: true
   Severity: error
+
+Barclays/Barc018ReviewService:
+  Enabled: true
+  Severity: warning
 
 Barclays/Barc019NoFindSudo:
-  Description: 'Prohibits dangerous find/sudo/chmod patterns'
   Enabled: true
   Severity: error
 
-# ============================================================
-# STANDARD COOKSTYLE OVERRIDES
-# ============================================================
-
-Layout/LineLength:
-  Max: 120
-
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
-
-Style/FrozenStringLiteralComment:
+Barclays/Barc020NoMiscCommands:
   Enabled: true
-  EnforcedStyle: always
+  Severity: warning
 
-Style/Documentation:
-  Enabled: false
-
-Style/GuardClause:
-  MinBodyLength: 3
-
-# ============================================================
-# CHEF-SPECIFIC COPS (from Cookstyle)
-# ============================================================
-
-Chef/Modernize/RespondToInMetadata:
+# BARC Metadata Rules (021-033)
+Barclays/Barc021ExactVersionDependency:
   Enabled: true
+  Severity: warning
 
-Chef/Modernize/UnnecessaryMixlibShelloutRequire:
+Barclays/Barc022NoChefExit:
   Enabled: true
+  Severity: error
 
-Chef/Security/SshPrivateKey:
+Barclays/Barc023SupportedPlatform:
   Enabled: true
+  Severity: warning
 
-Chef/Deprecations/DeprecatedChefSpecPlatform:
+Barclays/Barc024MaintainerInfo:
   Enabled: true
+  Severity: warning
 
-Chef/Correctness/InvalidPlatformFamilyHelper:
+Barclays/Barc025UnauthorizedTags:
   Enabled: true
+  Severity: error
 
+Barclays/Barc026NoNodeSave:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc027MiddlewarePackages:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc028RestrictedCookbookDeps:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc029CommunityCookbooks:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc030DeprecatedCookbooks:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc031ControlledPackages:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc032CookbookVersionFlags:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc033AllowedPinsOnly:
+  Enabled: true
+  Severity: error
+
+# BARC Attribute Rules (034-036)
+Barclays/Barc034RestrictedAttributesRoles:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc035RestrictedAttributes:
+  Enabled: true
+  Severity: error
+
+Barclays/Barc036JavaVersionPin:
+  Enabled: true
+  Severity: error
+
+Barclays/AttributeRestriction:
+  Enabled: true
+  Severity: error

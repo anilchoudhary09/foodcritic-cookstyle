@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARC Rules - Comprehensive Developer Documentation</title>
+    <style>
+        :root { --primary: #0066cc; --secondary: #2c3e50; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; --info: #3498db; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; margin: 0; padding: 0; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; padding: 40px 20px; text-align: center; margin-bottom: 30px; }
+        header h1 { margin: 0; font-size: 2.5em; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin: 2px; }
+        .badge-success { background: var(--success); color: white; }
+        .badge-danger { background: var(--danger); color: white; }
+        .badge-warning { background: var(--warning); color: white; }
+        .badge-info { background: var(--info); color: white; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); margin-bottom: 25px; overflow: hidden; }
+        .card-header { background: var(--secondary); color: white; padding: 18px 25px; font-size: 1.3em; font-weight: 600; }
+        .card-header.green { background: var(--success); }
+        .card-header.blue { background: var(--info); }
+        .card-header.red { background: var(--danger); }
+        .card-header.purple { background: #9b59b6; }
+        .card-body { padding: 25px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: var(--secondary); color: white; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        .code-block { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Consolas', monospace; overflow-x: auto; font-size: 14px; }
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .highlight-box { padding: 20px; border-radius: 8px; margin: 15px 0; }
+        .highlight-green { background: #e8f5e9; border-left: 5px solid var(--success); }
+        .highlight-yellow { background: #fff8e1; border-left: 5px solid var(--warning); }
+        .highlight-red { background: #ffebee; border-left: 5px solid var(--danger); }
+        .highlight-blue { background: #e3f2fd; border-left: 5px solid var(--info); }
+        .highlight-purple { background: #f3e5f5; border-left: 5px solid #9b59b6; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+        .line-ref { font-family: 'Consolas', monospace; background: #e8e8e8; padding: 2px 8px; border-radius: 4px; font-size: 0.9em; }
+        .toc { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); margin-bottom: 30px; }
+        .toc h3 { margin-top: 0; color: var(--secondary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .toc ul { list-style: none; padding: 0; columns: 2; }
+        .toc li { padding: 8px 0; }
+        .toc a { color: var(--primary); text-decoration: none; }
+        footer { text-align: center; padding: 30px; color: #666; border-top: 1px solid #ddd; margin-top: 40px; }
+        .arch-box { display: inline-block; padding: 20px 30px; margin: 10px; border-radius: 10px; font-weight: 600; text-align: center; min-width: 200px; }
+        .arch-static { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .arch-data { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+        .arch-deprecated { background: linear-gradient(135deg, #eb3349, #f45c43); color: white; }
+        .architecture-diagram { background: linear-gradient(to bottom, #e8f4fd, #fff); border: 2px solid var(--info); border-radius: 12px; padding: 30px; text-align: center; }
+        .arch-arrow { font-size: 2em; color: var(--primary); margin: 0 10px; }
+        .cmd-list { background: #f8f9fa; padding: 10px 15px; border-radius: 6px; font-family: monospace; margin: 5px 0; font-size: 0.9em; }
+        .new-badge { background: #27ae60; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>&#128736; BARC Rules Documentation</h1>
+    <p>Comprehensive Guide for b-cookstyle-rules Cookbook | Foodcritic to Cookstyle Migration</p>
+    <div style="margin-top: 20px;">
+        <span class="badge badge-success">36 BARC Rules</span>
+        <span class="badge badge-info">100% Parity</span>
+        <span class="badge badge-warning">Cookstyle 7.32.8</span>
+        <span class="badge badge-danger">1,446 Lines</span>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="toc">
+        <h3>&#128214; Table of Contents</h3>
+        <ul>
+            <li><a href="#architecture">1. Architecture Overview</a></li>
+            <li><a href="#file-structure">2. File Structure</a></li>
+            <li><a href="#rules-rb">3. rules.rb - Data File (Lines 1-1767)</a></li>
+            <li><a href="#deprecated">4. Deprecated Foodcritic Code (Lines 1768-2835)</a></li>
+            <li><a href="#barc-cops">5. barc_cops.rb - Static Engine</a></li>
+            <li><a href="#behavior">6. Rule Behavior - Command Coverage</a></li>
+            <li><a href="#enhancements">7. Recent Enhancements</a></li>
+            <li><a href="#all-rules">8. All 36 BARC Rules Reference</a></li>
+            <li><a href="#developer-guide">9. Developer Guide</a></li>
+        </ul>
+    </div>
+
+    <!-- Architecture -->
+    <div class="card" id="architecture">
+        <div class="card-header blue">&#128736; 1. Architecture Overview</div>
+        <div class="card-body">
+            <div class="architecture-diagram">
+                <div class="arch-box arch-data"><strong>rules.rb</strong><br><small>Part 1: Lines 1-1767</small><br><span class="badge badge-success">DATA - MODIFY THIS</span></div>
+                <span class="arch-arrow">&#8594;</span>
+                <div class="arch-box arch-static"><strong>barc_cops.rb</strong><br><small>1,253 lines</small><br><span class="badge badge-danger">STATIC ENGINE</span></div>
+                <span class="arch-arrow">&#8594;</span>
+                <div class="arch-box arch-deprecated"><strong>rules.rb</strong><br><small>Part 2: Lines 1768-2835</small><br><span class="badge badge-warning">DEPRECATED</span></div>
+            </div>
+
+            <div class="highlight-box highlight-blue" style="margin-top: 25px;">
+                <h4 style="margin-top: 0;">&#128161; Key Points</h4>
+                <ul>
+                    <li><strong>barc_cops.rb</strong> reads data from Part 1 of rules.rb (lines 1-1767)</li>
+                    <li>Part 2 of rules.rb (lines 1768-2835) contains Foodcritic rule definitions - <strong>DEPRECATED</strong></li>
+                    <li>Both Cookstyle and Foodcritic share the same data variables from Part 1</li>
+                    <li>Developers should ONLY modify Part 1 of rules.rb</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Structure -->
+    <div class="card" id="file-structure">
+        <div class="card-header">&#128193; 2. File Structure</div>
+        <div class="card-body">
+            <table>
+                <tr><th>File</th><th>Lines</th><th>Purpose</th><th>Action</th></tr>
+                <tr>
+                    <td><strong>rules.rb</strong> (Part 1)</td>
+                    <td class="line-ref">1-1767</td>
+                    <td>@ variable data (whitelists, blacklists, etc.)</td>
+                    <td><span class="badge badge-success">Modify</span></td>
+                </tr>
+                <tr style="background: #ffebee;">
+                    <td><strong>rules.rb</strong> (Part 2)</td>
+                    <td class="line-ref">1768-2835</td>
+                    <td>Foodcritic rule definitions (deprecated)</td>
+                    <td><span class="badge badge-danger">Never</span></td>
+                </tr>
+                <tr>
+                    <td><strong>barc_cops.rb</strong></td>
+                    <td>1,446</td>
+                    <td>Cookstyle cop implementations (static engine)</td>
+                    <td><span class="badge badge-danger">Never</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- rules.rb Part 1 -->
+    <div class="card" id="rules-rb">
+        <div class="card-header green">&#128221; 3. rules.rb Part 1 - Data Definitions (Lines 1-1767)</div>
+        <div class="card-body">
+            <p>This section contains all @ variable data structures used by BOTH Cookstyle and Foodcritic.</p>
+
+            <table>
+                <tr><th>Variable</th><th>Lines</th><th>Type</th><th>Used By Rules</th></tr>
+                <tr><td><code>@system_services</code></td><td class="line-ref">1-63</td><td>Array</td><td>BARC017, BARC018</td></tr>
+                <tr><td><code>@restricted_attributes</code></td><td class="line-ref">64-78</td><td>Hash</td><td>BARC034, BARC035</td></tr>
+                <tr><td><code>@restricted_services</code></td><td class="line-ref">79-458</td><td>Hash</td><td>BARC017, BARC018</td></tr>
+                <tr><td><code>@etc_whitelist</code></td><td class="line-ref">459-740</td><td>Hash</td><td>BARC005, BARC005a</td></tr>
+                <tr><td><code>@etc_blacklist</code></td><td class="line-ref">741-1054</td><td>Array</td><td>BARC005, BARC005a</td></tr>
+                <tr><td><code>@cmd_whitelist</code></td><td class="line-ref">1055-1084</td><td>Hash</td><td>All command rules</td></tr>
+                <tr><td><code>@platform_cookbook_whitelist</code></td><td class="line-ref">1085-1207</td><td>Array</td><td>ALL (bypass)</td></tr>
+                <tr><td><code>@cron_root_whitelist</code></td><td class="line-ref">1208-1212</td><td>Array</td><td>BARC015</td></tr>
+                <tr><td><code>@rpm_cookbook_whitelist</code></td><td class="line-ref">1213-1217</td><td>Array</td><td>BARC016</td></tr>
+                <tr><td><code>@selinux_cookbook_whitelist</code></td><td class="line-ref">1218-1226</td><td>Array</td><td>BARC007</td></tr>
+                <tr><td><code>@local_access_cookbook_whitelist</code></td><td class="line-ref">1227-1237</td><td>Array</td><td>BARC001, BARC002</td></tr>
+                <tr><td><code>@reboot_cookbook_whitelist</code></td><td class="line-ref">1238-1243</td><td>Array</td><td>BARC006</td></tr>
+                <tr><td><code>@tag_whitelist</code></td><td class="line-ref">1244-1262</td><td>Hash</td><td>BARC025</td></tr>
+                <tr><td><code>@mount_cookbook_whitelist</code></td><td class="line-ref">1263-1270</td><td>Array</td><td>BARC013</td></tr>
+                <tr><td><code>@system_services_cookbook_whitelist</code></td><td class="line-ref">1271-1275</td><td>Array</td><td>BARC017</td></tr>
+                <tr><td><code>@cookbook_coverage_whitelist</code></td><td class="line-ref">1281-1325</td><td>Hash</td><td>BARC021</td></tr>
+                <tr><td><code>@mw_cookbook_whitelist</code></td><td class="line-ref">1326-1368</td><td>Array</td><td>BARC027</td></tr>
+                <tr><td><code>@mw_pkg_prefixes</code></td><td class="line-ref">1369-1407</td><td>Array</td><td>BARC027</td></tr>
+                <tr><td><code>@restricted_cookbook_whitelist</code></td><td class="line-ref">1408-1421</td><td>Hash</td><td>BARC028</td></tr>
+                <tr><td><code>@blocked_cookbooks</code></td><td class="line-ref">1426-1433</td><td>Array</td><td>BARC029</td></tr>
+                <tr><td><code>@deprecated_cookbooks</code></td><td class="line-ref">1434-1439</td><td>Hash</td><td>BARC030</td></tr>
+                <tr><td><code>@controlled_packages</code></td><td class="line-ref">1440-1453</td><td>Hash</td><td>BARC031</td></tr>
+                <tr><td><code>@orac_java_hard_pined_up</code></td><td class="line-ref">1454-1465</td><td>Hash</td><td>BARC036</td></tr>
+                <tr><td><code>@cookbook_minimum_versions</code></td><td class="line-ref">1466-1478</td><td>Hash</td><td>BARC032</td></tr>
+                <tr><td><code>@whitelist_cookbook_allowed_pins_only</code></td><td class="line-ref">1479-1486</td><td>Array</td><td>BARC033</td></tr>
+                <tr><td><code>@cookbook_allowed_pins_only</code></td><td class="line-ref">1487-1574</td><td>Hash</td><td>BARC033</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Deprecated Section -->
+    <div class="card" id="deprecated">
+        <div class="card-header red">&#9888;&#65039; 4. Deprecated Foodcritic Code (Lines 1768-2835)</div>
+        <div class="card-body">
+            <div class="highlight-box highlight-red">
+                <h4 style="margin-top: 0;">&#128683; DO NOT MODIFY - Foodcritic Only</h4>
+                <p>Lines 1768-2835 contain <code>rule 'BARCXXX' do ... end</code> blocks that are ONLY compatible with Foodcritic. These are <strong>deprecated</strong> and will be removed when Foodcritic is sunset.</p>
+            </div>
+
+            <table>
+                <tr><th>Section</th><th>Lines</th><th>Compatibility</th><th>Status</th></tr>
+                <tr style="background: #e8f5e9;"><td>Part 1: @ Variables</td><td class="line-ref">1-1767</td><td>Cookstyle + Foodcritic</td><td><span class="badge badge-success">Active</span></td></tr>
+                <tr style="background: #ffebee;"><td>Part 2: rule definitions</td><td class="line-ref">1768-2835</td><td>Foodcritic ONLY</td><td><span class="badge badge-danger">Deprecated</span></td></tr>
+            </table>
+
+            <h4>What's in the Deprecated Section</h4>
+            <p>Contains helper functions and rule definitions:</p>
+            <ul>
+                <li><code>unix_forbidden_in_cmd()</code> - Foodcritic AST command checker</li>
+                <li><code>win_forbidden_in_cmd()</code> - Foodcritic Windows command checker</li>
+                <li><code>find_violations_cmd_unix()</code> - Finds Unix command violations</li>
+                <li><code>find_violations_cmd_win()</code> - Finds Windows command violations</li>
+                <li><code>rule 'BARC001' do ... end</code> through <code>rule 'BARC036' do ... end</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- barc_cops.rb -->
+    <div class="card" id="barc-cops">
+        <div class="card-header" style="background: #764ba2;">&#128274; 5. barc_cops.rb - Static Engine (1,446 lines)</div>
+        <div class="card-body">
+            <div class="highlight-box highlight-red">
+                <h4 style="margin-top: 0;">&#128683; NEVER MODIFY THIS FILE</h4>
+                <p>The barc_cops.rb file is the enforcement engine. It reads data from rules.rb and enforces all 36 BARC policies using RuboCop/Cookstyle.</p>
+            </div>
+
+            <h4>Structure</h4>
+            <table>
+                <tr><th>Section</th><th>Lines</th><th>Content</th></tr>
+                <tr><td>BarcRulesEngine module</td><td>~34-280</td><td>Data loader + helper methods</td></tr>
+                <tr><td>CookbookHelper module</td><td>~290-330</td><td>Shared helpers for cops</td></tr>
+                <tr><td>BARC001-020 Cops</td><td>~330-950</td><td>Core security/system rules</td></tr>
+                <tr><td>BARC021-036 Cops</td><td>~950-1446</td><td>Metadata/package rules (enhanced)</td></tr>
+            </table>
+
+            <h4>BarcRulesEngine Key Methods</h4>
+            <div class="code-block">
+<span class="comment"># Bypass checks</span>
+platform_bypass?(cookbook)       <span class="comment"># Bypasses ALL rules</span>
+local_access_bypass?(cookbook)   <span class="comment"># Bypasses BARC001, BARC002</span>
+reboot_bypass?(cookbook)         <span class="comment"># Bypasses BARC006</span>
+selinux_bypass?(cookbook)        <span class="comment"># Bypasses BARC007</span>
+mount_bypass?(cookbook)          <span class="comment"># Bypasses BARC013</span>
+cron_bypass?(cookbook)           <span class="comment"># Bypasses BARC015</span>
+rpm_bypass?(cookbook)            <span class="comment"># Bypasses BARC016</span>
+
+<span class="comment"># Check methods</span>
+etc_allowed?(path, cookbook)     <span class="comment"># BARC005, BARC005a</span>
+service_allowed?(svc, cookbook)  <span class="comment"># BARC017</span>
+service_needs_review?(svc, cb)   <span class="comment"># BARC018</span>
+cmd_whitelisted?(cmd, cookbook)  <span class="comment"># Command whitelist check</span>
+file_resource?(method_name)      <span class="comment"># Checks file resource types</span>
+tag_allowed?(tag, cookbook)      <span class="comment"># BARC025 - tag whitelist</span>
+mw_package?(pkg_name)            <span class="comment"># BARC027 - middleware package check</span>
+mw_cookbook_allowed?(cookbook)   <span class="comment"># BARC027 - MW cookbook bypass</span>
+controlled_package_allowed?(pkg) <span class="comment"># BARC031 - controlled package check</span>
+            </div>
+
+            <h4>Cop Helper Methods (NEW)</h4>
+            <div class="code-block">
+<span class="comment"># BARC021 - Library cookbook detection</span>
+library_cookbook?(dep_name)           <span class="comment"># Checks Berksfile.lock for b_cookbook_pipeline_library</span>
+
+<span class="comment"># BARC027/031 - Variable tracking</span>
+collect_mw_variable_names()           <span class="comment"># Finds variables holding MW packages</span>
+collect_controlled_variable_names()   <span class="comment"># Finds variables holding controlled packages</span>
+check_variable_usage(node)            <span class="comment"># Checks if resource uses tracked variable</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Behavior Section -->
+    <div class="card" id="behavior">
+        <div class="card-header blue">&#9881; 6. Rule Behavior - Command Coverage</div>
+        <div class="card-body">
+            <p>Each BARC rule checks for specific commands. Here's what each rule detects:</p>
+
+            <table>
+                <tr><th>Rule</th><th>Unix Commands</th><th>Windows Commands</th><th>Resources</th></tr>
+                <tr>
+                    <td><strong>BARC001</strong></td>
+                    <td class="cmd-list">useradd, usermod, userdel, passwd, chpasswd, adduser</td>
+                    <td class="cmd-list">net user, net.exe user, <strong>create("user")</strong><span class="new-badge">NEW</span></td>
+                    <td>user</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC002</strong></td>
+                    <td class="cmd-list">groupadd, groupmod, groupdel, addgroup</td>
+                    <td class="cmd-list">net group, net localgroup, net.exe group, net.exe localgroup, <strong>create("group")</strong><span class="new-badge">NEW</span></td>
+                    <td>group</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC003</strong></td>
+                    <td colspan="2">Checks file resources for /root/.ssh paths + <code>path</code> attribute</td>
+                    <td>file, template, etc.</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC004</strong></td>
+                    <td class="cmd-list">ssh-keygen, ssh-add</td>
+                    <td>-</td>
+                    <td>file resources with /.ssh/ paths</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC005</strong></td>
+                    <td colspan="2">Checks file resources for /etc/ paths against blacklist + <code>path</code> attribute</td>
+                    <td>All file resource types</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC006</strong></td>
+                    <td class="cmd-list">halt, shutdown, reboot, poweroff, systemctl shutdown/poweroff/halt/reboot</td>
+                    <td class="cmd-list">stop-computer, restart-computer, <strong>shutdown</strong><span class="new-badge">NEW</span></td>
+                    <td>reboot</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC007</strong></td>
+                    <td class="cmd-list">chcon, semanage, setenforce, setsebool, togglesebool, setfiles</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC008</strong></td>
+                    <td class="cmd-list">kill, pkill, killall, killall5, nice, renice</td>
+                    <td class="cmd-list">pskill, taskkill</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC009</strong></td>
+                    <td class="cmd-list">firewall-cmd, firewall-config, iptables</td>
+                    <td class="cmd-list">netsh firewall/advfirewall, set-netfirewall, set-netipsec, disable/enable/new/remove-netfirewall</td>
+                    <td>service (iptables, mpssvc, policyagent) + <strong>service_name attr</strong><span class="new-badge">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><strong>BARC010</strong></td>
+                    <td class="cmd-list">init, telinit</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC011</strong></td>
+                    <td class="cmd-list">rm, rmdir, dd</td>
+                    <td class="cmd-list">del, erase, deltree, remove-item</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC012</strong></td>
+                    <td class="cmd-list">kexec, sysctl, modprobe, insmod, rmmod</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC013</strong></td>
+                    <td class="cmd-list">lvremove, pvremove, vgremove, mkfs, wipefs, umount, mount, delpart, addpart, partx, kpartx, parted, partprobe, fdisk, fsck</td>
+                    <td class="cmd-list">diskpart, format, clear-disk, new-partition, remove-partition, remove-physicaldisk, set-partition</td>
+                    <td>mount</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC014</strong></td>
+                    <td class="cmd-list">ifup, ifdown, ip, ifcfg, ifconfig, ifenslave, ethtool, route</td>
+                    <td class="cmd-list">route, netsh, set-netipaddress, set-netipinterface, set-netipv4protocol, set-netipv6protocol, set-netroute, set-nettcpsetting, set-netudpsetting, remove-netroute, remove-netipaddress</td>
+                    <td>ifconfig, route</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC015</strong></td>
+                    <td class="cmd-list">crontab</td>
+                    <td>-</td>
+                    <td>cron, cron_d, /var/spool/cron files</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC016</strong></td>
+                    <td class="cmd-list">service, yum, rpm</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC017</strong></td>
+                    <td colspan="2" class="cmd-list">chkconfig, stop-service, net stop, net.exe stop, set-service, sc delete, sc.exe delete, sc stop, sc.exe stop, sc configure, sc.exe configure</td>
+                    <td>service, windows_service + <strong>service_name attr</strong><span class="new-badge">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><strong>BARC018</strong></td>
+                    <td colspan="2">Same as BARC017 (review mode)</td>
+                    <td>service, windows_service, systemd_unit + <strong>service_name attr</strong><span class="new-badge">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><strong>BARC019</strong></td>
+                    <td class="cmd-list">find, sudo</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC020</strong></td>
+                    <td class="cmd-list">fuser, setfacl, wall, smbclient</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>BARC025</strong></td>
+                    <td colspan="2">Checks <code>tag 'name'</code> AND <code>tags %w[name1 name2]</code><span class="new-badge">NEW</span></td>
+                    <td>tag, tags methods</td>
+                </tr>
+            </table>
+
+            <h4>File Resource Types Checked</h4>
+            <p>The following file resource types are checked by BARC003, BARC004, BARC005, BARC015:</p>
+            <div class="cmd-list">file, template, remote_file, cookbook_file, remote_directory, directory, append_if_no_line, replace_or_add, delete_lines, add_to_list, delete_from_list</div>
+        </div>
+    </div>
+
+    <!-- Enhancements Section -->
+    <div class="card" id="enhancements">
+        <div class="card-header purple">&#127775; 7. Recent Enhancements</div>
+        <div class="card-body">
+            <p>The following enhancements were made to ensure 100% parity with Foodcritic rules.rb:</p>
+
+            <table>
+                <tr><th>Rule</th><th>Enhancement</th><th>Details</th></tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC006</strong></td>
+                    <td>Added <code>shutdown</code> to WIN_CMDS</td>
+                    <td>Windows <code>shutdown</code> command now detected alongside stop-computer, restart-computer</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC009</strong></td>
+                    <td>Added <code>service_name</code> attribute check</td>
+                    <td>Detects firewall services via service_name attribute, not just resource name</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC017</strong></td>
+                    <td>Added <code>service_name</code> attribute check</td>
+                    <td>Detects system services via service_name attribute, not just resource name</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC018</strong></td>
+                    <td>Added <code>service_name</code> attribute check</td>
+                    <td>Detects services needing review via service_name attribute</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC025</strong></td>
+                    <td>Added <code>tags</code> (plural) support</td>
+                    <td>Now detects both <code>tag 'name'</code> AND <code>tags %w[name1 name2]</code></td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC001</strong></td>
+                    <td>Added .NET <code>create("user")</code> pattern</td>
+                    <td>Detects PowerShell .NET DirectoryEntry create("user") calls</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC002</strong></td>
+                    <td>Added .NET <code>create("group")</code> pattern</td>
+                    <td>Detects PowerShell .NET DirectoryEntry create("group") calls</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC021</strong></td>
+                    <td>Added library cookbook check</td>
+                    <td>Skips version requirement for <code>b_cookbook_pipeline_library</code> dependencies via Berksfile.lock</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC024</strong></td>
+                    <td>Added regex validation</td>
+                    <td>Validates maintainer (no special chars), email format, source_url (http/https + cookbook name)</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC027</strong></td>
+                    <td>Added variable tracking + 1-liner support</td>
+                    <td>Tracks variables holding MW packages; detects <code>package 'name'</code> without block</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC031</strong></td>
+                    <td>Added variable tracking + 1-liner support</td>
+                    <td>Tracks variables holding controlled packages; detects 1-liner package resources</td>
+                </tr>
+                <tr style="background: #e8f5e9;">
+                    <td><strong>BARC034</strong></td>
+                    <td>Added JSON role file support</td>
+                    <td>Now checks both <code>.rb</code> and <code>.json</code> role files for restricted attributes</td>
+                </tr>
+            </table>
+
+            <h4>Example: service_name Attribute Detection</h4>
+            <p>The following patterns are now detected:</p>
+            <div class="code-block">
+<span class="comment"># Resource name detection (original)</span>
+<span class="keyword">service</span> <span class="string">'sshd'</span> <span class="keyword">do</span>
+  action :start
+<span class="keyword">end</span>
+
+<span class="comment"># service_name attribute detection (NEW)</span>
+<span class="keyword">service</span> <span class="string">'my_ssh_service'</span> <span class="keyword">do</span>
+  service_name <span class="string">'sshd'</span>   <span class="comment"># &lt;-- Now detected!</span>
+  action :start
+<span class="keyword">end</span>
+            </div>
+
+            <h4>Example: tags (Plural) Detection</h4>
+            <div class="code-block">
+<span class="comment"># Single tag (original)</span>
+<span class="keyword">tag</span> <span class="string">'barc'</span>
+
+<span class="comment"># Multiple tags (NEW)</span>
+<span class="keyword">tags</span> %w[barc unix role]   <span class="comment"># &lt;-- Now detected!</span>
+<span class="keyword">tags</span> [<span class="string">'tag1'</span>, <span class="string">'tag2'</span>]    <span class="comment"># &lt;-- Also detected!</span>
+            </div>
+
+            <h4>Example: .NET PowerShell Pattern Detection (BARC001/002)</h4>
+            <div class="code-block">
+<span class="comment"># PowerShell .NET DirectoryEntry user creation (NEW)</span>
+<span class="keyword">powershell_script</span> <span class="string">'create_user'</span> <span class="keyword">do</span>
+  code &lt;&lt;-EOH
+    $ou = [ADSI]"WinNT://localhost"
+    $user = $ou.Create("user", "myuser")  <span class="comment"># &lt;-- BARC001 detected!</span>
+    $group = $ou.Create("group", "mygrp") <span class="comment"># &lt;-- BARC002 detected!</span>
+  EOH
+<span class="keyword">end</span>
+            </div>
+
+            <h4>Example: Variable Tracking (BARC027/031)</h4>
+            <div class="code-block">
+<span class="comment"># Variable holding MW package (NEW - tracked)</span>
+mw_package = <span class="string">'jboss-eap-7.0'</span>   <span class="comment"># &lt;-- Variable tracked</span>
+
+<span class="keyword">package</span> mw_package <span class="keyword">do</span>          <span class="comment"># &lt;-- BARC027 violation!</span>
+  action :install
+<span class="keyword">end</span>
+
+<span class="comment"># 1-liner resource (NEW - detected)</span>
+<span class="keyword">package</span> <span class="string">'tomcat-8.5.0'</span>         <span class="comment"># &lt;-- BARC027 detected without block!</span>
+            </div>
+
+            <h4>Example: BARC024 Regex Validation (NEW)</h4>
+            <div class="code-block">
+<span class="comment"># metadata.rb validation patterns:</span>
+MAINTAINER_PATTERN = /\A[^0-9`!@#\$%\^&*+_=]+\z/   <span class="comment"># No special chars/numbers</span>
+EMAIL_PATTERN = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+SOURCE_URL_PATTERN = /^(http(s)?):(\/\/)/i          <span class="comment"># Must be http/https</span>
+
+<span class="comment"># Also validates: source_url must contain cookbook name</span>
+<span class="keyword">source_url</span> <span class="string">'https://github.com/org/my-cookbook'</span>  <span class="comment"># ✓ Valid</span>
+<span class="keyword">source_url</span> <span class="string">'https://github.com/org/other-repo'</span>   <span class="comment"># ✗ Missing cookbook name</span>
+            </div>
+
+            <h4>Example: BARC034 JSON Role Support (NEW)</h4>
+            <div class="code-block">
+<span class="comment"># Now checks BOTH .rb and .json role files:</span>
+
+<span class="comment"># roles/my_role.rb</span>
+default_attributes(
+  <span class="string">'enable_custom_sudoers_policies'</span> => <span class="keyword">true</span>  <span class="comment"># &lt;-- BARC034 violation!</span>
+)
+
+<span class="comment"># roles/my_role.json (NEW - now detected)</span>
+{
+  <span class="string">"default_attributes"</span>: {
+    <span class="string">"enable_custom_sudoers_policies"</span>: <span class="keyword">true</span>  <span class="comment">// &lt;-- BARC034 violation!</span>
+  }
+}
+            </div>
+        </div>
+    </div>
+
+    <!-- All Rules -->
+    <div class="card" id="all-rules">
+        <div class="card-header">&#128203; 8. All 36 BARC Rules Reference</div>
+        <div class="card-body">
+            <table>
+                <tr><th>Rule</th><th>Description</th><th>Whitelist Variable</th><th>Severity</th></tr>
+                <tr><td>BARC001</td><td>No local user manipulation</td><td><code>@local_access_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC002</td><td>No local group manipulation</td><td><code>@local_access_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC003</td><td>No /root/.ssh files</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC004</td><td>No SSH key manipulation</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC005</td><td>/etc file restrictions</td><td><code>@etc_whitelist</code>, <code>@etc_blacklist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC005a</td><td>/etc in attributes</td><td><code>@etc_whitelist</code>, <code>@etc_blacklist</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC006</td><td>No reboot/shutdown</td><td><code>@reboot_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC007</td><td>No SELinux manipulation</td><td><code>@selinux_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC008</td><td>No kill/nice commands</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC009</td><td>No firewall manipulation</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC010</td><td>No init/telinit</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC011</td><td>No rm/rmdir/dd</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC012</td><td>No kernel manipulation</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC013</td><td>No volume/mount manipulation</td><td><code>@mount_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC014</td><td>No network manipulation</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC015</td><td>No root cron</td><td><code>@cron_root_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC016</td><td>Use Chef resources</td><td><code>@rpm_cookbook_whitelist</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC017</td><td>System service restrictions</td><td><code>@restricted_services</code>, <code>@system_services_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC018</td><td>Service review (informational)</td><td><code>@restricted_services</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC019</td><td>No find/sudo</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC020</td><td>No fuser/setfacl/wall/smbclient</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC021</td><td>Exact version dependency</td><td><code>@cookbook_coverage_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC022</td><td>No raise/fail/fatal!</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC023</td><td>Supported platform in metadata</td><td>None</td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC024</td><td>Maintainer info in metadata</td><td>None</td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC025</td><td>Node tags whitelist</td><td><code>@tag_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC026</td><td>No node.save</td><td><code>@platform_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC027</td><td>Middleware packages</td><td><code>@mw_cookbook_whitelist</code>, <code>@mw_pkg_prefixes</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC028</td><td>Restricted cookbook deps</td><td><code>@restricted_cookbook_whitelist</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC029</td><td>Community cookbook access</td><td><code>@blocked_cookbooks</code>, <code>@cookbook_wraps</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC030</td><td>Deprecated cookbooks</td><td><code>@deprecated_cookbooks</code></td><td><span class="badge badge-warning">Warning</span></td></tr>
+                <tr><td>BARC031</td><td>Controlled packages</td><td><code>@controlled_packages</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC032</td><td>Cookbook version flags</td><td><code>@cookbook_minimum_versions</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC033</td><td>Allowed pins only</td><td><code>@whitelist_cookbook_allowed_pins_only</code>, <code>@cookbook_allowed_pins_only</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC034</td><td>Restricted attrs in roles</td><td><code>@restricted_attributes</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC035</td><td>Restricted attributes</td><td><code>@restricted_attributes</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+                <tr><td>BARC036</td><td>Java version hard pin</td><td><code>@orac_java_hard_pined_up</code></td><td><span class="badge badge-danger">Error</span></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Developer Guide -->
+    <div class="card" id="developer-guide">
+        <div class="card-header green">&#128187; 9. Developer Guide</div>
+        <div class="card-body">
+            <div class="highlight-box highlight-green">
+                <h4 style="margin-top: 0;">&#9889; Golden Rule</h4>
+                <p style="font-size: 1.2em; margin-bottom: 0;"><strong>ONLY modify rules.rb Part 1 (Lines 1-1767)</strong></p>
+            </div>
+
+            <h4>Common Tasks</h4>
+            <div class="two-col">
+                <div class="highlight-box highlight-blue">
+                    <h5>Allow /etc path (BARC005)</h5>
+                    <p>Variable: <code>@etc_whitelist</code> (Lines 459-740)</p>
+                    <div class="code-block"><span class="string">'/etc/myapp/'</span> => [<span class="string">'my-cookbook'</span>], <span class="comment"># CHG123</span></div>
+                </div>
+                <div class="highlight-box highlight-blue">
+                    <h5>Allow service (BARC017)</h5>
+                    <p>Variable: <code>@restricted_services</code> (Lines 79-458)</p>
+                    <div class="code-block"><span class="string">'myservice'</span> => [<span class="string">'my-cookbook'</span>], <span class="comment"># CHG123</span></div>
+                </div>
+                <div class="highlight-box highlight-blue">
+                    <h5>Bypass ALL rules</h5>
+                    <p>Variable: <code>@platform_cookbook_whitelist</code> (Lines 1085-1207)</p>
+                    <div class="code-block"><span class="string">'my-platform-cookbook'</span>, <span class="comment"># CHG123</span></div>
+                </div>
+                <div class="highlight-box highlight-blue">
+                    <h5>Allow local users (BARC001/002)</h5>
+                    <p>Variable: <code>@local_access_cookbook_whitelist</code> (Lines 1227-1237)</p>
+                    <div class="code-block"><span class="string">'my-cookbook'</span>, <span class="comment"># CHG123</span></div>
+                </div>
+                <div class="highlight-box highlight-blue">
+                    <h5>Allow tags (BARC025)</h5>
+                    <p>Variable: <code>@tag_whitelist</code> (Lines 1244-1262)</p>
+                    <div class="code-block"><span class="string">'my-cookbook'</span> => %w[<span class="string">tag1 tag2</span>], <span class="comment"># CHG123</span></div>
+                </div>
+                <div class="highlight-box highlight-blue">
+                    <h5>Allow reboot (BARC006)</h5>
+                    <p>Variable: <code>@reboot_cookbook_whitelist</code> (Lines 1238-1243)</p>
+                    <div class="code-block"><span class="string">'my-cookbook'</span>, <span class="comment"># CHG123</span></div>
+                </div>
+            </div>
+
+            <h4>Running Cookstyle</h4>
+            <div class="code-block">
+<span class="comment"># Check a cookbook with all BARC rules</span>
+$ cookstyle --config cookbooks/b-cookstyle-rules/.rubocop.yml \
+    --only Barclays cookbooks/your-cookbook/
+
+<span class="comment"># Summary format</span>
+$ cookstyle --config cookbooks/b-cookstyle-rules/.rubocop.yml \
+    --only Barclays --format offenses cookbooks/your-cookbook/
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p><strong>BARC Rules Documentation</strong> | b-cookstyle-rules Cookbook | April 2026</p>
+    <p>Cookstyle 7.32.8 | Ruby 3.1 | 36 Rules | 100% Parity with Foodcritic | <strong>1,446 lines</strong></p>
+</footer>
+
+</body>
+</html>

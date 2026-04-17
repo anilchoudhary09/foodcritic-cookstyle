@@ -1,0 +1,5 @@
+name 'complaint-cookbook'
+version '1.0.0'
+maintainer 'Barclays'
+license 'Apache-2.0'
+description 'A compliant cookbook that follows all BARC rules'

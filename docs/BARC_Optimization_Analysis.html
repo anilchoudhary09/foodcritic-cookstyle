@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>barc_cops.rb Optimization Analysis &amp; Built-in Cookstyle Overlap Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background: #fff; color: #172b4d; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #0052cc; border-bottom: 2px solid #0052cc; padding-bottom: 10px; }
+        h2 { color: #172b4d; border-bottom: 1px solid #dfe1e6; padding-bottom: 8px; margin-top: 30px; }
+        h3 { color: #42526e; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #dfe1e6; padding: 10px 12px; text-align: left; vertical-align: top; }
+        th { background: #f4f5f7; font-weight: 600; color: #172b4d; }
+        tr:nth-child(even) { background: #fafbfc; }
+        code { background: #f4f5f7; padding: 2px 6px; border-radius: 3px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13px; }
+        pre { background: #172b4d; color: #b3d4fc; padding: 15px; border-radius: 3px; overflow-x: auto; font-size: 13px; white-space: pre-wrap; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: #00875a; color: white; }
+        .badge-warning { background: #ff8b00; color: white; }
+        .badge-danger { background: #de350b; color: white; }
+        .badge-info { background: #0065ff; color: white; }
+        .badge-purple { background: #6554c0; color: white; }
+        .info-panel { background: #deebff; border-left: 4px solid #0065ff; padding: 15px; margin: 15px 0; }
+        .success-panel { background: #e3fcef; border-left: 4px solid #00875a; padding: 15px; margin: 15px 0; }
+        .warning-panel { background: #fffae6; border-left: 4px solid #ff8b00; padding: 15px; margin: 15px 0; }
+        .danger-panel { background: #ffebe6; border-left: 4px solid #de350b; padding: 15px; margin: 15px 0; }
+        .toc { background: #f4f5f7; padding: 20px; border-radius: 3px; margin-bottom: 30px; }
+        .toc ul { list-style: none; padding: 0; margin: 0; columns: 2; }
+        .toc li { padding: 5px 0; }
+        .toc a { color: #0052cc; text-decoration: none; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #dfe1e6; color: #5e6c84; font-size: 14px; }
+        .status-keep { background: #e3fcef; }
+        .status-replace { background: #deebff; }
+        .status-optimize { background: #fffae6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>📊 barc_cops.rb Optimization Analysis</h1>
+<p><strong>Purpose:</strong> Identify optimization opportunities and overlaps with built-in Cookstyle cops</p>
+<p>Analysis Date: 20 April 2026 | barc_cops.rb: 1,446 lines | 36 BARC Rules</p>
+
+<!-- Table of Contents -->
+<div class="toc">
+    <h3 style="margin-top: 0;">📑 Table of Contents</h3>
+    <ul>
+        <li><a href="#summary">1. Executive Summary</a></li>
+        <li><a href="#optimizations">2. Code Optimization Opportunities</a></li>
+        <li><a href="#overlaps">3. Built-in Cookstyle Overlaps</a></li>
+        <li><a href="#removal-candidates">4. Potential Removal Candidates</a></li>
+        <li><a href="#keep-reasons">5. Why to Keep BARC Rules</a></li>
+        <li><a href="#recommendations">6. Recommendations</a></li>
+    </ul>
+</div>
+
+<!-- Executive Summary -->
+<h2 id="summary">1. Executive Summary</h2>
+
+<div class="info-panel">
+    <strong>Analysis Results</strong><br>
+    <ul style="margin: 10px 0 0 0;">
+        <li><strong>Total BARC Rules:</strong> 36 + 1 (AttributeRestriction)</li>
+        <li><strong>Overlaps with Built-in Cookstyle:</strong> 6 rules (partial or full)</li>
+        <li><strong>Optimization Opportunities:</strong> 4 areas identified</li>
+        <li><strong>Recommended for Removal:</strong> 1-2 rules (optional)</li>
+        <li><strong>Must Keep:</strong> 34+ rules (enterprise-specific logic)</li>
+    </ul>
+</div>
+
+<table>
+    <tr>
+        <th>Category</th>
+        <th>Count</th>
+        <th>Notes</th>
+    </tr>
+    <tr class="status-keep">
+        <td>Enterprise-Specific (Keep)</td>
+        <td>30</td>
+        <td>No built-in equivalent, uses rules.rb data</td>
+    </tr>
+    <tr class="status-replace">
+        <td>Overlap with Built-in (Consider)</td>
+        <td>6</td>
+        <td>Could be replaced, but BARC versions have bypass logic</td>
+    </tr>
+</table>
+
+<!-- Code Optimizations -->
+<h2 id="optimizations">2. Code Optimization Opportunities</h2>
+
+<h3>2.1 Extract Common Command Check Pattern</h3>
+
+<div class="warning-panel">
+    <strong>Current Issue:</strong> Multiple cops repeat the same command-checking pattern with different command lists.
+</div>
+
+<p>The following cops share nearly identical <code>on_block</code> patterns:</p>
+
+<table>
+    <tr>
+        <th>Cop</th>
+        <th>Pattern</th>
+        <th>Optimization</th>
+    </tr>
+    <tr>
+        <td>BARC007, BARC008, BARC010, BARC012, BARC019, BARC020</td>
+        <td>Check execute/bash for forbidden commands</td>
+        <td>Extract to shared module</td>
+    </tr>
+</table>
+
+<p><strong>Proposed Optimization:</strong></p>
+<pre>
+# Add to CookbookHelper module
+module CommandChecker
+  def check_forbidden_commands(node, unix_cmds, win_cmds = [], opts = {})
+    return unless execute_resource?(node)
+    cmd = extract_command(node)
+    return unless cmd
+    
+    cmd_lower = cmd.downcase
+    return unless unix_cmds.any? { |c| cmd =~ /\b#{c}\b/i } ||
+                  win_cmds.any? { |c| cmd_lower.include?(c) }
+    add_offense(node.send_node)
+  end
+  
+  def execute_resource?(node)
+    %i[execute bash script powershell_script batch].include?(node.send_node.method_name)
+  end
+end
+
+# Simplified cop:
+class Barc007NoSelinux < RuboCop::Cop::Base
+  include CookbookHelper
+  include CommandChecker
+  
+  MSG = 'BARC007: Do not manipulate SELinux configuration.'
+  FORBIDDEN_CMDS = %w[chcon semanage setenforce setsebool togglesebool setfiles].freeze
+
+  def on_block(node)
+    return if BarcRulesEngine.platform_bypass?(cookbook_name) || BarcRulesEngine.selinux_bypass?(cookbook_name)
+    check_forbidden_commands(node, FORBIDDEN_CMDS)
+  end
+end
+</pre>
+
+<p><strong>Estimated Reduction:</strong> ~100-150 lines</p>
+
+<h3>2.2 Consolidate Service Name Extraction</h3>
+
+<div class="warning-panel">
+    <strong>Current Issue:</strong> <code>extract_service_name()</code> is defined in 4 different cops (BARC009, BARC017, BARC018).
+</div>
+
+<p><strong>Proposed Optimization:</strong> Move to <code>CookbookHelper</code> module once.</p>
+
+<pre>
+# Move to CookbookHelper
+def extract_service_name(node)
+  node.each_descendant(:send) do |send_node|
+    return extract_string(send_node.arguments.first) if send_node.method_name == :service_name
+  end
+  nil
+end
+</pre>
+
+<p><strong>Estimated Reduction:</strong> ~30 lines</p>
+
+<h3>2.3 Consolidate Package Name Extraction</h3>
+
+<div class="warning-panel">
+    <strong>Current Issue:</strong> <code>extract_package_name_attr()</code> is defined in both BARC027 and BARC031.
+</div>
+
+<p><strong>Proposed Optimization:</strong> Move to <code>CookbookHelper</code> module once.</p>
+
+<p><strong>Estimated Reduction:</strong> ~15 lines</p>
+
+<h3>2.4 Consolidate Path Attribute Extraction</h3>
+
+<div class="warning-panel">
+    <strong>Current Issue:</strong> <code>extract_path_attribute()</code> is defined in BARC003, BARC004, BARC005.
+</div>
+
+<p><strong>Proposed Optimization:</strong> Move to <code>CookbookHelper</code> module once.</p>
+
+<p><strong>Estimated Reduction:</strong> ~20 lines</p>
+
+<h3>Summary: Potential Line Reduction</h3>
+
+<table>
+    <tr>
+        <th>Optimization</th>
+        <th>Lines Saved</th>
+    </tr>
+    <tr>
+        <td>Extract CommandChecker module</td>
+        <td>~100-150</td>
+    </tr>
+    <tr>
+        <td>Consolidate extract_service_name()</td>
+        <td>~30</td>
+    </tr>
+    <tr>
+        <td>Consolidate extract_package_name_attr()</td>
+        <td>~15</td>
+    </tr>
+    <tr>
+        <td>Consolidate extract_path_attribute()</td>
+        <td>~20</td>
+    </tr>
+    <tr>
+        <th>Total Potential Savings</th>
+        <th>~165-215 lines (11-15%)</th>
+    </tr>
+</table>
+
+<!-- Built-in Overlaps -->
+<h2 id="overlaps">3. Built-in Cookstyle Overlaps</h2>
+
+<p>The following BARC rules have partial or full overlap with built-in Cookstyle cops:</p>
+
+<table>
+    <tr>
+        <th>BARC Rule</th>
+        <th>Built-in Cookstyle Cop</th>
+        <th>Overlap Level</th>
+        <th>Difference</th>
+    </tr>
+    <tr class="status-replace">
+        <td><strong>BARC026</strong><br>No node.save</td>
+        <td><code>Chef/Correctness/CookbookUsesNodeSave</code></td>
+        <td><span class="badge badge-danger">EXACT</span></td>
+        <td>Built-in has no bypass logic. BARC has <code>@platform_cookbook_whitelist</code> bypass.</td>
+    </tr>
+    <tr class="status-replace">
+        <td><strong>BARC022</strong><br>No chef exit (raise/fail)</td>
+        <td><code>Chef/Correctness/ChefApplicationFatal</code></td>
+        <td><span class="badge badge-warning">PARTIAL</span></td>
+        <td>Built-in only checks <code>Chef::Application.fatal!</code>. BARC also checks <code>raise</code> and <code>fail</code>.</td>
+    </tr>
+    <tr class="status-replace">
+        <td><strong>BARC004</strong><br>No SSH keys</td>
+        <td><code>Chef/Security/SshPrivateKey</code></td>
+        <td><span class="badge badge-warning">PARTIAL</span></td>
+        <td>Built-in checks for SSH private keys in code. BARC checks commands (ssh-keygen) and file paths.</td>
+    </tr>
+    <tr class="status-replace">
+        <td><strong>BARC024</strong><br>Maintainer info</td>
+        <td><code>Chef/Sharing/EmptyMetadataField</code><br><code>Chef/Sharing/DefaultMetadataMaintainer</code></td>
+        <td><span class="badge badge-warning">PARTIAL</span></td>
+        <td>Built-in checks for empty/default values. BARC adds regex validation + source_url cookbook name check.</td>
+    </tr>
+    <tr class="status-replace">
+        <td><strong>BARC011</strong><br>No rm/rmdir (PowerShell)</td>
+        <td><code>Chef/Correctness/PowershellScriptDeleteFile</code></td>
+        <td><span class="badge badge-info">MINIMAL</span></td>
+        <td>Built-in only checks PowerShell. BARC checks Unix + Windows + more commands.</td>
+    </tr>
+    <tr class="status-replace">
+        <td><strong>BARC023</strong><br>Supported platform</td>
+        <td><code>Chef/Correctness/InvalidPlatformMetadata</code></td>
+        <td><span class="badge badge-info">MINIMAL</span></td>
+        <td>Built-in validates platform values. BARC requires <code>supports</code> keyword to exist.</td>
+    </tr>
+</table>
+
+<!-- Removal Candidates -->
+<h2 id="removal-candidates">4. Potential Removal Candidates</h2>
+
+<div class="danger-panel">
+    <strong>⚠️ Caution:</strong> Before removing any BARC rule, ensure the bypass/whitelist functionality is not needed. Built-in Cookstyle cops do NOT have exception mechanisms.
+</div>
+
+<h3>4.1 BARC026 (No node.save) - Can Be Replaced</h3>
+
+<table>
+    <tr>
+        <th>Aspect</th>
+        <th>BARC026</th>
+        <th>Chef/Correctness/CookbookUsesNodeSave</th>
+    </tr>
+    <tr>
+        <td>Functionality</td>
+        <td>Detects <code>node.save</code></td>
+        <td>Detects <code>node.save</code></td>
+    </tr>
+    <tr>
+        <td>Bypass</td>
+        <td>✅ <code>@platform_cookbook_whitelist</code></td>
+        <td>❌ None</td>
+    </tr>
+    <tr>
+        <td>Recommendation</td>
+        <td colspan="2"><span class="badge badge-warning">KEEP if bypass needed</span> or <span class="badge badge-info">REPLACE if no exceptions required</span></td>
+    </tr>
+</table>
+
+<p><strong>To Replace:</strong></p>
+<pre>
+# In .rubocop.yml, enable:
+Chef/Correctness/CookbookUsesNodeSave:
+  Enabled: true
+
+# And remove Barc026NoNodeSave class from barc_cops.rb
+</pre>
+
+<h3>4.2 BARC022 (No chef exit) - Partial Replacement</h3>
+
+<p>Could enable built-in for <code>fatal!</code> but would lose <code>raise</code>/<code>fail</code> detection:</p>
+
+<table>
+    <tr>
+        <th>Detection</th>
+        <th>BARC022</th>
+        <th>Built-in</th>
+    </tr>
+    <tr>
+        <td><code>raise</code></td>
+        <td>✅</td>
+        <td>❌</td>
+    </tr>
+    <tr>
+        <td><code>fail</code></td>
+        <td>✅</td>
+        <td>❌</td>
+    </tr>
+    <tr>
+        <td><code>Chef::Application.fatal!</code></td>
+        <td>✅</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>Recommendation</td>
+        <td colspan="2"><span class="badge badge-success">KEEP BARC022</span> - broader detection</td>
+    </tr>
+</table>
+
+<!-- Why Keep BARC -->
+<h2 id="keep-reasons">5. Why to Keep BARC Rules</h2>
+
+<div class="success-panel">
+    <strong>✅ Key Reasons to Keep BARC Rules:</strong>
+</div>
+
+<h3>5.1 Enterprise Bypass/Exception Mechanism</h3>
+
+<p>The core value of BARC rules is the <strong>whitelist/bypass mechanism</strong> driven by <code>rules.rb</code>:</p>
+
+<table>
+    <tr>
+        <th>Feature</th>
+        <th>BARC Rules</th>
+        <th>Built-in Cookstyle</th>
+    </tr>
+    <tr>
+        <td>Per-cookbook exceptions</td>
+        <td>✅ <code>@etc_whitelist</code>, <code>@restricted_services</code>, etc.</td>
+        <td>❌ Global only</td>
+    </tr>
+    <tr>
+        <td>Per-path exceptions</td>
+        <td>✅ <code>@etc_whitelist['/etc/myapp/'] => ['cookbook1']</code></td>
+        <td>❌ Not supported</td>
+    </tr>
+    <tr>
+        <td>Per-service exceptions</td>
+        <td>✅ <code>@restricted_services['mysql'] => []</code></td>
+        <td>❌ Not supported</td>
+    </tr>
+    <tr>
+        <td>Change ticket tracking</td>
+        <td>✅ Comments in rules.rb</td>
+        <td>❌ Not built-in</td>
+    </tr>
+    <tr>
+        <td>Platform cookbook bypass</td>
+        <td>✅ <code>@platform_cookbook_whitelist</code></td>
+        <td>❌ Manual exclusion per cop</td>
+    </tr>
+</table>
+
+<h3>5.2 Rules with No Built-in Equivalent</h3>
+
+<p>The following 30 BARC rules have <strong>no equivalent</strong> in built-in Cookstyle:</p>
+
+<table>
+    <tr>
+        <th>Rule</th>
+        <th>Description</th>
+        <th>Enterprise Logic</th>
+    </tr>
+    <tr><td>BARC001</td><td>No local users</td><td>AD-only policy</td></tr>
+    <tr><td>BARC002</td><td>No local groups</td><td>AD-only policy</td></tr>
+    <tr><td>BARC003</td><td>No /root/.ssh</td><td>Security policy</td></tr>
+    <tr><td>BARC005/5a</td><td>/etc blacklist</td><td>Path-based whitelist</td></tr>
+    <tr><td>BARC006</td><td>No reboot</td><td>Uptime policy</td></tr>
+    <tr><td>BARC007</td><td>No SELinux</td><td>Security config lock</td></tr>
+    <tr><td>BARC008</td><td>No kill</td><td>Process safety</td></tr>
+    <tr><td>BARC009</td><td>No firewall</td><td>Network security policy</td></tr>
+    <tr><td>BARC010</td><td>No init/telinit</td><td>Runlevel safety</td></tr>
+    <tr><td>BARC012</td><td>No kernel manipulation</td><td>Kernel integrity</td></tr>
+    <tr><td>BARC013</td><td>No volume/mount</td><td>Storage policy</td></tr>
+    <tr><td>BARC014</td><td>No network config</td><td>Network safety</td></tr>
+    <tr><td>BARC015</td><td>No root cron</td><td>Scheduled task policy</td></tr>
+    <tr><td>BARC016</td><td>Use Chef resources</td><td>Best practice enforcement</td></tr>
+    <tr><td>BARC017</td><td>System services</td><td>Service whitelist</td></tr>
+    <tr><td>BARC018</td><td>Service review</td><td>Review process</td></tr>
+    <tr><td>BARC019</td><td>No find/sudo</td><td>Privilege escalation</td></tr>
+    <tr><td>BARC020</td><td>No misc commands</td><td>Forbidden commands</td></tr>
+    <tr><td>BARC021</td><td>Exact version deps</td><td>Version pinning policy</td></tr>
+    <tr><td>BARC025</td><td>Node tags whitelist</td><td>Tag governance</td></tr>
+    <tr><td>BARC027</td><td>Middleware packages</td><td>MW team ownership</td></tr>
+    <tr><td>BARC028</td><td>Restricted cookbook deps</td><td>Dependency governance</td></tr>
+    <tr><td>BARC029</td><td>Community cookbooks</td><td>Approved cookbooks only</td></tr>
+    <tr><td>BARC030</td><td>Deprecated cookbooks</td><td>Migration enforcement</td></tr>
+    <tr><td>BARC031</td><td>Controlled packages</td><td>Package governance</td></tr>
+    <tr><td>BARC032</td><td>Version flags</td><td>Minimum version policy</td></tr>
+    <tr><td>BARC033</td><td>Allowed pins</td><td>Pin policy</td></tr>
+    <tr><td>BARC034</td><td>Restricted attrs roles</td><td>Role attribute policy</td></tr>
+    <tr><td>BARC035</td><td>Restricted attributes</td><td>Attribute governance</td></tr>
+    <tr><td>BARC036</td><td>Java version pin</td><td>Java version control</td></tr>
+</table>
+
+<!-- Recommendations -->
+<h2 id="recommendations">6. Recommendations</h2>
+
+<h3>6.1 Code Optimizations (Recommended)</h3>
+
+<div class="success-panel">
+    <strong>DO:</strong>
+    <ol>
+        <li>Extract <code>CommandChecker</code> module for common command detection</li>
+        <li>Move repeated helper methods to <code>CookbookHelper</code>:
+            <ul>
+                <li><code>extract_service_name()</code></li>
+                <li><code>extract_package_name_attr()</code></li>
+                <li><code>extract_path_attribute()</code></li>
+            </ul>
+        </li>
+        <li>Consider memoization for <code>cookbook_name</code> calls</li>
+    </ol>
+</div>
+
+<h3>6.2 Replacements (Optional)</h3>
+
+<div class="warning-panel">
+    <strong>CONSIDER (only if bypass not needed):</strong>
+    <ol>
+        <li><strong>BARC026</strong> → <code>Chef/Correctness/CookbookUsesNodeSave</code></li>
+    </ol>
+    <strong>DO NOT REPLACE:</strong>
+    <ol>
+        <li><strong>BARC022</strong> - broader detection than built-in</li>
+        <li><strong>BARC004</strong> - checks commands + paths, not just keys in code</li>
+        <li><strong>BARC024</strong> - has regex validation + cookbook name in URL check</li>
+        <li><strong>BARC011</strong> - covers Unix + Windows, built-in is PowerShell only</li>
+        <li><strong>BARC023</strong> - requires existence, not just validation</li>
+    </ol>
+</div>
+
+<h3>6.3 Final Recommendation</h3>
+
+<div class="info-panel">
+    <strong>Summary:</strong>
+    <ul>
+        <li><strong>Keep all 36 BARC rules</strong> - the enterprise bypass/exception mechanism is the core value</li>
+        <li><strong>Apply code optimizations</strong> - can reduce ~165-215 lines (11-15%)</li>
+        <li><strong>Optionally enable built-in cops as additional checks</strong> - they can complement BARC rules</li>
+        <li><strong>BARC026 is the only rule</strong> that could be fully replaced by built-in</li>
+    </ul>
+</div>
+
+<h3>6.4 Complementary Built-in Cops to Enable</h3>
+
+<p>These built-in cops add value WITHOUT replacing BARC rules:</p>
+
+<pre>
+# .rubocop.yml additions
+Chef/Correctness/ChefApplicationFatal:
+  Enabled: true  # Complements BARC022
+
+Chef/Security/SshPrivateKey:
+  Enabled: true  # Complements BARC004
+
+Chef/Sharing/EmptyMetadataField:
+  Enabled: true  # Complements BARC024
+
+Chef/Sharing/InvalidLicenseString:
+  Enabled: true  # No BARC equivalent
+
+Chef/Correctness/PowershellScriptDeleteFile:
+  Enabled: true  # Complements BARC011
+</pre>
+
+<footer>
+    <p><strong>barc_cops.rb Optimization Analysis</strong> | b-cookstyle-rules Cookbook</p>
+    <p>Analysis Date: 20 April 2026 | Cookstyle 7.32.8</p>
+    <p>Current: 1,446 lines | Potential: 1,230-1,280 lines after optimization</p>
+</footer>
+
+</div>
+</body>
+</html>

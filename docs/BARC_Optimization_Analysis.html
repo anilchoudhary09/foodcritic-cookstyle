@@ -121,13 +121,13 @@ module CommandChecker
     return unless execute_resource?(node)
     cmd = extract_command(node)
     return unless cmd
-    
+
     cmd_lower = cmd.downcase
     return unless unix_cmds.any? { |c| cmd =~ /\b#{c}\b/i } ||
                   win_cmds.any? { |c| cmd_lower.include?(c) }
     add_offense(node.send_node)
   end
-  
+
   def execute_resource?(node)
     %i[execute bash script powershell_script batch].include?(node.send_node.method_name)
   end
@@ -137,7 +137,7 @@ end
 class Barc007NoSelinux < RuboCop::Cop::Base
   include CookbookHelper
   include CommandChecker
-  
+
   MSG = 'BARC007: Do not manipulate SELinux configuration.'
   FORBIDDEN_CMDS = %w[chcon semanage setenforce setsebool togglesebool setfiles].freeze
 

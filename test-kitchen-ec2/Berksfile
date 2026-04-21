@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source 'https://supermarket.chef.io'
+
+# Test cookbooks
+cookbook 'compliant-cookbook', path: '../cookbooks/compliant-cookbook'
+cookbook 'my-app-cookbook', path: '../cookbooks/my-app-cookbook'
+
+# Dependencies
+cookbook 'apt'

@@ -1,0 +1,12 @@
+DEPENDENCIES
+  apt
+  compliant-cookbook
+    path: ../cookbooks/compliant-cookbook
+  my-app-cookbook
+    path: ../cookbooks/my-app-cookbook
+
+GRAPH
+  apt (7.7.0)
+  compliant-cookbook (1.0.0)
+    apt (>= 0.0.0)
+  my-app-cookbook (1.0.0)

@@ -1,0 +1,598 @@
+#!/usr/bin/env groovy
+
+/**
+ * Jenkins Pipeline for Cookbook Compliance Testing
+ *
+ * ARCHITECTURE:
+ * - This Jenkinsfile lives in its own repository (e.g., chef-ci-pipeline)
+ * - b-cookstyle-rules is a separate repository containing custom Cookstyle rules
+ * - Cookbooks are fetched from Stash/Bitbucket for testing
+ *
+ * WORKFLOW:
+ * 1. Checkout this pipeline repository (contains scripts and templates)
+ * 2. Fetch cookbook from Stash/Bitbucket
+ * 3. Fetch b-cookstyle-rules from Stash/Bitbucket
+ * 4. Run Cookstyle compliance checks
+ * 5. Generate and publish reports
+ */
+
+pipeline {
+    agent {
+        label 'chef-workstation'  // Use agent with Chef Workstation installed
+    }
+
+    parameters {
+        // ─────────────────────────────────────────────────────────────────
+        // COOKBOOK PARAMETERS
+        // ─────────────────────────────────────────────────────────────────
+        string(
+            name: 'COOKBOOK_NAME',
+            defaultValue: '',
+            description: 'Name of the cookbook to test (required)'
+        )
+        string(
+            name: 'COOKBOOK_REPO_URL',
+            defaultValue: '',
+            description: 'Stash/Bitbucket repository URL for the cookbook (e.g., ssh://git@stash.company.com:7999/chef/my-cookbook.git)'
+        )
+        string(
+            name: 'COOKBOOK_BRANCH',
+            defaultValue: 'master',
+            description: 'Branch of the cookbook to test'
+        )
+        string(
+            name: 'COOKBOOK_SUBDIRECTORY',
+            defaultValue: '',
+            description: 'Subdirectory within repo if cookbook is not at root (optional, e.g., "cookbooks/my-cookbook")'
+        )
+
+        // ─────────────────────────────────────────────────────────────────
+        // COOKSTYLE RULES PARAMETERS
+        // ─────────────────────────────────────────────────────────────────
+        string(
+            name: 'COOKSTYLE_RULES_REPO',
+            defaultValue: 'ssh://git@stash.company.com:7999/chef/b-cookstyle-rules.git',
+            description: 'Stash/Bitbucket URL for b-cookstyle-rules repository'
+        )
+        string(
+            name: 'COOKSTYLE_RULES_BRANCH',
+            defaultValue: 'master',
+            description: 'Branch of b-cookstyle-rules to use'
+        )
+
+        // ─────────────────────────────────────────────────────────────────
+        // PIPELINE BEHAVIOR PARAMETERS
+        // ─────────────────────────────────────────────────────────────────
+        booleanParam(
+            name: 'AUTO_CORRECT',
+            defaultValue: false,
+            description: 'Attempt to auto-correct fixable violations'
+        )
+        booleanParam(
+            name: 'FAIL_ON_VIOLATIONS',
+            defaultValue: true,
+            description: 'Fail the build if violations are found'
+        )
+        choice(
+            name: 'SEVERITY_THRESHOLD',
+            choices: ['convention', 'warning', 'error'],
+            description: 'Minimum severity level to report'
+        )
+        string(
+            name: 'NOTIFICATION_EMAIL',
+            defaultValue: '',
+            description: 'Email address for notifications (optional)'
+        )
+    }
+
+    environment {
+        // Workspace directories
+        WORKSPACE_DIR = "${WORKSPACE}"
+        COOKBOOK_DIR = "${WORKSPACE}/cookbook-under-test"
+        RULES_DIR = "${WORKSPACE}/b-cookstyle-rules"
+        REPORTS_DIR = "${WORKSPACE}/reports"
+        SCRIPTS_DIR = "${WORKSPACE}/pipeline-scripts"
+
+        // Ruby configuration
+        RUBY_VERSION = '3.1.0'
+        BUNDLE_PATH = "${WORKSPACE}/vendor/bundle"
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '50'))
+        disableConcurrentBuilds()
+        skipDefaultCheckout(false)  // Checkout this pipeline repo
+    }
+
+    stages {
+        stage('Validate Parameters') {
+            steps {
+                script {
+                    if (!params.COOKBOOK_NAME?.trim()) {
+                        error "COOKBOOK_NAME parameter is required"
+                    }
+                    if (!params.COOKBOOK_REPO_URL?.trim()) {
+                        error "COOKBOOK_REPO_URL is required"
+                    }
+
+                    // Set build description
+                    currentBuild.description = "${params.COOKBOOK_NAME} (${params.COOKBOOK_BRANCH})"
+
+                    echo """
+╔════════════════════════════════════════════════════════════════╗
+║           COOKBOOK COMPLIANCE TESTING PIPELINE                  ║
+╠════════════════════════════════════════════════════════════════╣
+║ Cookbook:      ${params.COOKBOOK_NAME.padRight(43)}║
+║ Repository:    ${params.COOKBOOK_REPO_URL.take(43).padRight(43)}║
+║ Branch:        ${params.COOKBOOK_BRANCH.padRight(43)}║
+║ Auto-correct:  ${params.AUTO_CORRECT.toString().padRight(43)}║
+║ Fail on error: ${params.FAIL_ON_VIOLATIONS.toString().padRight(43)}║
+╚════════════════════════════════════════════════════════════════╝
+                    """
+                }
+            }
+        }
+
+        stage('Setup Workspace') {
+            steps {
+                echo "🔧 Setting up workspace directories..."
+                sh """
+                    # Create necessary directories
+                    mkdir -p ${COOKBOOK_DIR}
+                    mkdir -p ${RULES_DIR}
+                    mkdir -p ${REPORTS_DIR}
+                    mkdir -p ${SCRIPTS_DIR}
+
+                    # Copy pipeline scripts from checked out repo
+                    # (This Jenkinsfile repo should contain phase2-cicd folder)
+                    if [ -d "${WORKSPACE}/phase2-cicd/scripts" ]; then
+                        cp -r ${WORKSPACE}/phase2-cicd/scripts/* ${SCRIPTS_DIR}/
+                        chmod +x ${SCRIPTS_DIR}/*.sh
+                    fi
+
+                    if [ -d "${WORKSPACE}/phase2-cicd/templates" ]; then
+                        mkdir -p ${SCRIPTS_DIR}/templates
+                        cp -r ${WORKSPACE}/phase2-cicd/templates/* ${SCRIPTS_DIR}/templates/
+                    fi
+                """
+            }
+        }
+
+        stage('Fetch Sources') {
+            parallel {
+                stage('Fetch Cookbook from Stash') {
+                    steps {
+                        echo "📥 Fetching cookbook '${params.COOKBOOK_NAME}' from Stash..."
+                        dir("${COOKBOOK_DIR}") {
+                            checkout([
+                                $class: 'GitSCM',
+                                branches: [[name: "*/${params.COOKBOOK_BRANCH}"]],
+                                extensions: [
+                                    [$class: 'CloneOption', depth: 1, shallow: true],
+                                    [$class: 'CleanBeforeCheckout']
+                                ],
+                                userRemoteConfigs: [[
+                                    url: params.COOKBOOK_REPO_URL,
+                                    credentialsId: 'stash-credentials'
+                                ]]
+                            ])
+                        }
+
+                        // Handle subdirectory if specified
+                        script {
+                            if (params.COOKBOOK_SUBDIRECTORY?.trim()) {
+                                sh """
+                                    SUBDIR="${COOKBOOK_DIR}/${params.COOKBOOK_SUBDIRECTORY}"
+                                    if [ -d "\$SUBDIR" ]; then
+                                        # Move subdirectory contents to cookbook dir
+                                        TEMP_DIR=\$(mktemp -d)
+                                        cp -r "\$SUBDIR"/* "\$TEMP_DIR/"
+                                        rm -rf ${COOKBOOK_DIR}/*
+                                        mv "\$TEMP_DIR"/* ${COOKBOOK_DIR}/
+                                        rm -rf "\$TEMP_DIR"
+                                        echo "Extracted cookbook from subdirectory: ${params.COOKBOOK_SUBDIRECTORY}"
+                                    else
+                                        echo "ERROR: Subdirectory not found: ${params.COOKBOOK_SUBDIRECTORY}"
+                                        exit 1
+                                    fi
+                                """
+                            }
+                        }
+                    }
+                }
+
+                stage('Fetch Cookstyle Rules from Stash') {
+                    steps {
+                        echo "📦 Fetching b-cookstyle-rules from Stash..."
+                        dir("${RULES_DIR}") {
+                            checkout([
+                                $class: 'GitSCM',
+                                branches: [[name: "*/${params.COOKSTYLE_RULES_BRANCH}"]],
+                                extensions: [
+                                    [$class: 'CloneOption', depth: 1, shallow: true],
+                                    [$class: 'CleanBeforeCheckout']
+                                ],
+                                userRemoteConfigs: [[
+                                    url: params.COOKSTYLE_RULES_REPO,
+                                    credentialsId: 'stash-credentials'
+                                ]]
+                            ])
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Verify Cookbook Structure') {
+            steps {
+                echo "🔍 Verifying cookbook structure..."
+                script {
+                    def hasMetadata = fileExists("${COOKBOOK_DIR}/metadata.rb") || fileExists("${COOKBOOK_DIR}/metadata.json")
+                    if (!hasMetadata) {
+                        error """
+Cookbook validation failed!
+No metadata.rb or metadata.json found in ${COOKBOOK_DIR}
+
+Please verify:
+1. COOKBOOK_REPO_URL points to a valid cookbook repository
+2. COOKBOOK_SUBDIRECTORY is correct if cookbook is not at repo root
+                        """
+                    }
+
+                    // Display cookbook info
+                    sh """
+                        echo "Cookbook contents:"
+                        ls -la ${COOKBOOK_DIR}/
+                        echo ""
+                        if [ -f "${COOKBOOK_DIR}/metadata.rb" ]; then
+                            echo "Metadata:"
+                            head -20 ${COOKBOOK_DIR}/metadata.rb
+                        fi
+                    """
+                }
+            }
+        }
+
+        stage('Setup Ruby Environment') {
+            steps {
+                echo "💎 Setting up Ruby environment..."
+                sh """
+                    # Show Ruby version
+                    ruby --version || echo "Ruby not found in PATH"
+
+                    # Install bundler if needed
+                    gem install bundler --no-document 2>/dev/null || true
+
+                    # Install dependencies from b-cookstyle-rules
+                    cd ${RULES_DIR}
+
+                    # Create Gemfile if not exists
+                    if [ ! -f Gemfile ]; then
+                        cat > Gemfile << 'GEMFILE'
+source 'https://rubygems.org'
+gem 'cookstyle', '~> 7.32'
+gem 'json', '~> 2.6'
+GEMFILE
+                    fi
+
+                    bundle config set --local path '${BUNDLE_PATH}'
+                    bundle install --jobs 4 --retry 3
+
+                    echo "Cookstyle version:"
+                    bundle exec cookstyle --version
+                """
+            }
+        }
+
+        stage('Run Cookstyle') {
+            steps {
+                echo "🔍 Running Cookstyle compliance checks..."
+                script {
+                    def autoCorrectFlag = params.AUTO_CORRECT ? '--autocorrect' : ''
+
+                    // Create .rubocop.yml config for the cookbook
+                    sh """
+                        cat > ${COOKBOOK_DIR}/.rubocop.yml << 'RUBOCOP_CONFIG'
+# Auto-generated Cookstyle configuration
+require:
+  - ${RULES_DIR}/barc_cops.rb
+
+AllCops:
+  TargetChefVersion: 18.0
+  NewCops: enable
+  Include:
+    - '**/*.rb'
+  Exclude:
+    - 'vendor/**/*'
+    - 'test/**/*'
+    - 'spec/**/*'
+    - 'files/**/*'
+    - 'Berksfile'
+    - 'Gemfile'
+    - 'Rakefile'
+
+BARC:
+  Enabled: true
+RUBOCOP_CONFIG
+                    """
+
+                    // Run cookstyle and capture exit code
+                    def exitCode = sh(
+                        script: """
+                            cd ${RULES_DIR}
+
+                            # Run cookstyle with multiple output formats
+                            bundle exec cookstyle \\
+                                --config "${COOKBOOK_DIR}/.rubocop.yml" \\
+                                --format progress \\
+                                --format json --out "${REPORTS_DIR}/cookstyle-output.json" \\
+                                ${autoCorrectFlag} \\
+                                "${COOKBOOK_DIR}" 2>&1 | tee "${REPORTS_DIR}/cookstyle-console.log"
+
+                            exit \${PIPESTATUS[0]}
+                        """,
+                        returnStatus: true
+                    )
+
+                    env.COOKSTYLE_EXIT_CODE = exitCode.toString()
+                    env.HAS_VIOLATIONS = (exitCode != 0).toString()
+
+                    if (exitCode != 0) {
+                        echo "⚠️ Cookstyle found violations (exit code: ${exitCode})"
+                    } else {
+                        echo "✅ No violations found"
+                    }
+                }
+            }
+        }
+
+        stage('Generate Reports') {
+            steps {
+                echo "📊 Generating compliance reports..."
+                script {
+                    // Generate summary
+                    sh """
+                        if [ -f "${REPORTS_DIR}/cookstyle-output.json" ]; then
+                            cd ${RULES_DIR}
+
+                            # Generate summary text
+                            bundle exec ruby -rjson << 'RUBY_SCRIPT' > ${REPORTS_DIR}/summary.txt
+require 'json'
+
+data = JSON.parse(File.read('${REPORTS_DIR}/cookstyle-output.json'))
+summary = data['summary'] || {}
+
+offense_count = summary['offense_count'] || 0
+file_count = summary['inspected_file_count'] || 0
+corrected = summary['corrected_offense_count'] || 0
+
+by_severity = Hash.new(0)
+(data['files'] || []).each do |file|
+  (file['offenses'] || []).each do |offense|
+    by_severity[offense['severity']] += 1
+  end
+end
+
+puts "║ Cookbook:      ${params.COOKBOOK_NAME}"
+puts "║ Files checked: #{file_count}"
+puts "║ Violations:    #{offense_count}"
+puts "║ Corrected:     #{corrected}" if corrected > 0
+puts "║"
+puts "║ By Severity:"
+by_severity.each { |sev, count| puts "║   #{sev.capitalize}: #{count}" }
+RUBY_SCRIPT
+
+                            # Generate JUnit XML for Jenkins
+                            bundle exec ruby -rjson -rcgi << 'RUBY_SCRIPT' > ${REPORTS_DIR}/cookstyle-junit.xml
+require 'json'
+require 'cgi'
+
+data = JSON.parse(File.read('${REPORTS_DIR}/cookstyle-output.json'))
+summary = data['summary'] || {}
+files = data['files'] || []
+
+total_tests = summary['inspected_file_count'] || 0
+failures = summary['offense_count'] || 0
+
+puts '<?xml version="1.0" encoding="UTF-8"?>'
+puts "<testsuite name=\"Cookstyle\" tests=\"#{total_tests}\" failures=\"#{failures}\" errors=\"0\" time=\"0\">"
+
+files.each do |file|
+  path = file['path']
+  offenses = file['offenses'] || []
+
+  if offenses.empty?
+    puts "  <testcase name=\"#{CGI.escapeHTML(path)}\" classname=\"Cookstyle\" time=\"0\"/>"
+  else
+    offenses.each do |offense|
+      cop = offense['cop_name']
+      msg = offense['message']
+      line = offense.dig('location', 'line') || 0
+      sev = offense['severity']
+
+      puts "  <testcase name=\"#{CGI.escapeHTML(path)}:#{line}\" classname=\"#{CGI.escapeHTML(cop)}\" time=\"0\">"
+      puts "    <failure message=\"#{CGI.escapeHTML(msg)}\" type=\"#{sev}\">"
+      puts "      File: #{CGI.escapeHTML(path)}"
+      puts "      Line: #{line}"
+      puts "      Cop: #{CGI.escapeHTML(cop)}"
+      puts "      Severity: #{sev}"
+      puts "    </failure>"
+      puts "  </testcase>"
+    end
+  end
+end
+
+puts "</testsuite>"
+RUBY_SCRIPT
+
+                        fi
+                    """
+
+                    // Generate HTML report if script exists
+                    if (fileExists("${SCRIPTS_DIR}/generate_report.rb")) {
+                        sh """
+                            cd ${RULES_DIR}
+                            bundle exec ruby ${SCRIPTS_DIR}/generate_report.rb \\
+                                --input "${REPORTS_DIR}/cookstyle-output.json" \\
+                                --output "${REPORTS_DIR}" \\
+                                --cookbook "${params.COOKBOOK_NAME}" \\
+                                --template-dir "${SCRIPTS_DIR}/templates" || true
+                        """
+                    } else {
+                        echo "Report generator script not found, using basic report"
+                        // Create basic HTML report
+                        sh """
+                            cat > ${REPORTS_DIR}/compliance-report.html << 'HTML_REPORT'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cookstyle Report - ${params.COOKBOOK_NAME}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        pre { background: #f4f4f4; padding: 15px; overflow: auto; }
+        .pass { color: green; } .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Cookstyle Compliance Report</h1>
+    <p><strong>Cookbook:</strong> ${params.COOKBOOK_NAME}</p>
+    <p><strong>Branch:</strong> ${params.COOKBOOK_BRANCH}</p>
+    <p><strong>Status:</strong> <span class="${env.HAS_VIOLATIONS == 'true' ? 'fail' : 'pass'}">${env.HAS_VIOLATIONS == 'true' ? 'VIOLATIONS FOUND' : 'PASSED'}</span></p>
+    <h2>Console Output</h2>
+    <pre>
+HTML_REPORT
+                            cat ${REPORTS_DIR}/cookstyle-console.log >> ${REPORTS_DIR}/compliance-report.html || true
+                            echo '</pre></body></html>' >> ${REPORTS_DIR}/compliance-report.html
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Publish Results') {
+            steps {
+                echo "📤 Publishing results..."
+
+                // Archive artifacts
+                archiveArtifacts(
+                    artifacts: 'reports/**/*',
+                    allowEmptyArchive: true,
+                    fingerprint: true
+                )
+
+                // Publish HTML report
+                publishHTML(target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'reports',
+                    reportFiles: 'compliance-report.html',
+                    reportName: 'Cookstyle Compliance Report'
+                ])
+
+                // Publish JUnit results
+                junit(
+                    testResults: 'reports/cookstyle-junit.xml',
+                    allowEmptyResults: true
+                )
+            }
+        }
+
+        stage('Quality Gate') {
+            when {
+                expression { params.FAIL_ON_VIOLATIONS && env.HAS_VIOLATIONS == 'true' }
+            }
+            steps {
+                script {
+                    def summary = ""
+                    if (fileExists("${REPORTS_DIR}/summary.txt")) {
+                        summary = readFile("${REPORTS_DIR}/summary.txt")
+                    }
+                    error """
+╔════════════════════════════════════════════════════════════════╗
+║                    QUALITY GATE FAILED                          ║
+╠════════════════════════════════════════════════════════════════╣
+${summary}
+╚════════════════════════════════════════════════════════════════╝
+
+Review the Cookstyle Compliance Report for details.
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "🧹 Cleaning up workspace..."
+            sh """
+                # Clean up sensitive files
+                rm -rf ${WORKSPACE}/chef-key.pem 2>/dev/null || true
+
+                # Keep reports, clean up large directories
+                rm -rf ${COOKBOOK_DIR}/.git 2>/dev/null || true
+                rm -rf ${RULES_DIR}/.git 2>/dev/null || true
+            """
+        }
+
+        success {
+            script {
+                if (params.NOTIFICATION_EMAIL?.trim()) {
+                    emailext(
+                        to: params.NOTIFICATION_EMAIL,
+                        subject: "✅ Cookbook Compliance: ${params.COOKBOOK_NAME} - PASSED",
+                        body: """
+                            <h2>Cookbook Compliance Check Passed</h2>
+                            <p><strong>Cookbook:</strong> ${params.COOKBOOK_NAME}</p>
+                            <p><strong>Repository:</strong> ${params.COOKBOOK_REPO_URL}</p>
+                            <p><strong>Branch:</strong> ${params.COOKBOOK_BRANCH}</p>
+                            <p><strong>Build:</strong> <a href="${BUILD_URL}">#${BUILD_NUMBER}</a></p>
+                            <p>View the full report: <a href="${BUILD_URL}Cookstyle_Compliance_Report/">Compliance Report</a></p>
+                        """,
+                        mimeType: 'text/html'
+                    )
+                }
+            }
+            echo """
+╔════════════════════════════════════════════════════════════════╗
+║                    ✅ BUILD SUCCESSFUL                          ║
+║                                                                  ║
+║  Cookbook '${params.COOKBOOK_NAME}' passed compliance checks    ║
+╚════════════════════════════════════════════════════════════════╝
+            """
+        }
+
+        failure {
+            script {
+                if (params.NOTIFICATION_EMAIL?.trim()) {
+                    emailext(
+                        to: params.NOTIFICATION_EMAIL,
+                        subject: "❌ Cookbook Compliance: ${params.COOKBOOK_NAME} - FAILED",
+                        body: """
+                            <h2>Cookbook Compliance Check Failed</h2>
+                            <p><strong>Cookbook:</strong> ${params.COOKBOOK_NAME}</p>
+                            <p><strong>Repository:</strong> ${params.COOKBOOK_REPO_URL}</p>
+                            <p><strong>Branch:</strong> ${params.COOKBOOK_BRANCH}</p>
+                            <p><strong>Build:</strong> <a href="${BUILD_URL}">#${BUILD_NUMBER}</a></p>
+                    )
+                }
+            }
+            echo """
+╔════════════════════════════════════════════════════════════════╗
+║                    ❌ BUILD FAILED                               ║
+║                                                                  ║
+║  Cookbook '${params.COOKBOOK_NAME}' has compliance violations   ║
+║  Review the Cookstyle Compliance Report for details             ║
+╚════════════════════════════════════════════════════════════════╝
+            """
+        }
+
+        unstable {
+            echo "⚠️ Build is unstable. Check the reports for warnings."
+        }
+    }
+}

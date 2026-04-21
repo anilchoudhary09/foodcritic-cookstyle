@@ -1,0 +1,31 @@
+# Phase 2 CI/CD .gitignore
+
+# Dependencies
+vendor/
+.bundle/
+Gemfile.lock
+
+# Test output
+test-output/
+reports/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Credentials (NEVER commit these)
+*.pem
+*.key
+credentials.yaml
+secrets.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.bak

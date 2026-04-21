@@ -1,0 +1,19 @@
+# Gemfile for Cookbook Compliance Pipeline
+#
+# This file manages Ruby dependencies for running Cookstyle
+# and generating compliance reports.
+
+source 'https://rubygems.org'
+
+# Cookstyle - Chef's linting tool (includes RuboCop)
+gem 'cookstyle', '~> 7.32'
+
+# Additional dependencies for report generation
+gem 'json', '~> 2.6'
+gem 'erb', '~> 4.0'
+
+# Testing dependencies (optional, for running specs)
+group :development, :test do
+  gem 'rspec', '~> 3.12'
+  gem 'rake', '~> 13.0'
+end

@@ -1,0 +1,57 @@
+# Test Kitchen Configuration for Existing EC2 Instance
+#
+# This configuration connects to an existing EC2 instance with Chef Workstation 25
+# and runs kitchen converge with Chef Client 19
+#
+# Usage:
+#   cd test-kitchen-ec2
+#   kitchen list
+#   kitchen converge
+#   kitchen verify
+#
+# To run cookstyle first:
+#   cookstyle ../cookbooks/compliant-cookbook --config ../cookbooks/b-cookstyle-rules/.rubocop.yml
+
+---
+driver:
+  name: proxy
+  host: ec2-13-203-101-198.ap-south-1.compute.amazonaws.com
+  port: 22
+
+provisioner:
+  name: chef_infra
+  product_name: chef
+  product_version: 19           # Chef Client 19
+  chef_license: accept-silent
+  log_level: info
+  always_update_cookbooks: true
+
+verifier:
+  name: inspec
+
+transport:
+  name: ssh
+  username: ec2-user
+  ssh_key: /Users/achoudha/Documents/AWSKeys/anil-aws-mumbai.pem
+  connection_timeout: 30
+  connection_retries: 5
+
+platforms:
+  - name: amazon-linux-2023
+
+suites:
+  - name: compliant
+    run_list:
+      - recipe[compliant-cookbook::default]
+    verifier:
+      inspec_tests:
+        - ../cookbooks/compliant-cookbook/test/integration/default
+    attributes:
+
+  - name: my-app
+    run_list:
+      - recipe[my-app-cookbook::compliant]
+    verifier:
+      inspec_tests:
+        - ../cookbooks/my-app-cookbook/test/integration/default
+    attributes:

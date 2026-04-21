@@ -1,0 +1,240 @@
+#!/usr/bin/env groovy
+
+/**
+ * Jenkinsfile for Bitbucket Webhook Integration
+ *
+ * This pipeline is triggered by Bitbucket webhooks when:
+ * - A push is made to a cookbook repository
+ * - A pull request is created or updated
+ *
+ * It automatically detects the cookbook from the webhook payload.
+ */
+
+pipeline {
+    agent {
+        label 'chef-workstation'
+    }
+
+    triggers {
+        // Generic Webhook Trigger for Bitbucket
+        GenericTrigger(
+            genericVariables: [
+                [key: 'REPO_NAME', value: '$.repository.name'],
+                [key: 'REPO_CLONE_URL', value: '$.repository.links.clone[?(@.name=="ssh")].href', defaultValue: ''],
+                [key: 'BRANCH_NAME', value: '$.changes[0].ref.displayId', defaultValue: 'master'],
+                [key: 'COMMIT_HASH', value: '$.changes[0].toHash', defaultValue: ''],
+                [key: 'ACTOR', value: '$.actor.displayName', defaultValue: 'Unknown'],
+                [key: 'PR_ID', value: '$.pullRequest.id', defaultValue: ''],
+                [key: 'PR_TITLE', value: '$.pullRequest.title', defaultValue: '']
+            ],
+            token: 'cookbook-compliance-webhook',
+            causeString: 'Triggered by Bitbucket webhook',
+            printContributedVariables: true,
+            printPostContent: true,
+            silentResponse: false
+        )
+    }
+
+    parameters {
+        string(
+            name: 'COOKBOOK_NAME',
+            defaultValue: '',
+            description: 'Cookbook name (auto-detected from webhook or manual input)'
+        )
+        string(
+            name: 'BITBUCKET_REPO_URL',
+            defaultValue: '',
+            description: 'Repository URL (auto-detected from webhook or manual input)'
+        )
+        string(
+            name: 'BRANCH',
+            defaultValue: 'master',
+            description: 'Branch to test'
+        )
+        booleanParam(
+            name: 'FAIL_ON_VIOLATIONS',
+            defaultValue: true,
+            description: 'Fail the build if violations are found'
+        )
+    }
+
+    environment {
+        WORKSPACE_DIR = "${WORKSPACE}"
+        COOKBOOK_DIR = "${WORKSPACE}/cookbook-under-test"
+        RULES_DIR = "${WORKSPACE}/b-cookstyle-rules"
+        REPORTS_DIR = "${WORKSPACE}/reports"
+        // Use webhook data if available, otherwise use parameters
+        EFFECTIVE_COOKBOOK = "${REPO_NAME ?: params.COOKBOOK_NAME}"
+        EFFECTIVE_REPO_URL = "${REPO_CLONE_URL ?: params.BITBUCKET_REPO_URL}"
+        EFFECTIVE_BRANCH = "${BRANCH_NAME ?: params.BRANCH}"
+    }
+
+    options {
+        timeout(time: 20, unit: 'MINUTES')
+        timestamps()
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '100'))
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    // Determine source of trigger
+                    def triggerSource = REPO_NAME ? 'Bitbucket Webhook' : 'Manual'
+
+                    echo """
+╔════════════════════════════════════════════════════════════════╗
+║           COOKBOOK COMPLIANCE CHECK                             ║
+╠════════════════════════════════════════════════════════════════╣
+║ Trigger:  ${triggerSource.padRight(48)}║
+║ Cookbook: ${EFFECTIVE_COOKBOOK.padRight(48)}║
+║ Branch:   ${EFFECTIVE_BRANCH.padRight(48)}║
+║ Actor:    ${ACTOR?.padRight(48) ?: 'N/A'.padRight(48)}║
+${PR_ID ? "║ PR:       #${PR_ID} - ${PR_TITLE}".padRight(64) + '║' : ''}
+╚════════════════════════════════════════════════════════════════╝
+                    """
+
+                    if (!EFFECTIVE_COOKBOOK || !EFFECTIVE_REPO_URL) {
+                        error "Could not determine cookbook name or repository URL"
+                    }
+
+                    // Set build description
+                    currentBuild.description = "${EFFECTIVE_COOKBOOK} (${EFFECTIVE_BRANCH})"
+                }
+            }
+        }
+
+        stage('Checkout Rules') {
+            steps {
+                dir("${RULES_DIR}") {
+                    git(
+                        url: 'ssh://git@bitbucket.company.com/chef/b-cookstyle-rules.git',
+                        branch: 'master',
+                        credentialsId: 'bitbucket-credentials'
+                    )
+                }
+            }
+        }
+
+        stage('Checkout Cookbook') {
+            steps {
+                dir("${COOKBOOK_DIR}") {
+                    git(
+                        url: env.EFFECTIVE_REPO_URL,
+                        branch: env.EFFECTIVE_BRANCH,
+                        credentialsId: 'bitbucket-credentials'
+                    )
+                }
+            }
+        }
+
+        stage('Setup') {
+            steps {
+                sh """
+                    mkdir -p ${REPORTS_DIR}
+                    cd ${RULES_DIR}
+                    bundle install --path vendor/bundle --jobs 4
+                """
+            }
+        }
+
+        stage('Run Compliance Check') {
+            steps {
+                script {
+                    def exitCode = sh(
+                        script: """
+                            cd ${WORKSPACE_DIR}
+                            ./phase2-cicd/scripts/run_cookstyle.sh \\
+                                --cookbook "${COOKBOOK_DIR}" \\
+                                --rules "${RULES_DIR}" \\
+                                --output "${REPORTS_DIR}" \\
+                                --format all
+                        """,
+                        returnStatus: true
+                    )
+
+                    env.VIOLATIONS_FOUND = (exitCode != 0).toString()
+                }
+            }
+        }
+
+        stage('Generate Report') {
+            steps {
+                sh """
+                    cd ${WORKSPACE_DIR}
+                    ruby ./phase2-cicd/scripts/generate_report.rb \\
+                        --input "${REPORTS_DIR}/cookstyle-output.json" \\
+                        --output "${REPORTS_DIR}" \\
+                        --cookbook "${EFFECTIVE_COOKBOOK}"
+                """
+            }
+        }
+
+        stage('Publish') {
+            steps {
+                // Archive reports
+                archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
+
+                // Publish HTML report
+                publishHTML(target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'reports',
+                    reportFiles: 'compliance-report.html',
+                    reportName: 'Compliance Report'
+                ])
+
+                // Publish JUnit results
+                junit testResults: 'reports/cookstyle-junit.xml', allowEmptyResults: true
+            }
+        }
+
+        stage('Update PR Status') {
+            when {
+                expression { env.PR_ID }
+            }
+            steps {
+                script {
+                    def status = env.VIOLATIONS_FOUND == 'true' ? 'FAILED' : 'SUCCESSFUL'
+                    def description = env.VIOLATIONS_FOUND == 'true' ?
+                        'Compliance violations found' :
+                        'All compliance checks passed'
+
+                    // Update Bitbucket build status
+                    // This requires the Bitbucket Build Status Notifier plugin
+                    bitbucketStatusNotify(
+                        buildState: status,
+                        buildKey: 'cookstyle',
+                        buildName: 'Cookstyle Compliance',
+                        buildDescription: description
+                    )
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            when {
+                expression { params.FAIL_ON_VIOLATIONS && env.VIOLATIONS_FOUND == 'true' }
+            }
+            steps {
+                error "Compliance violations found - failing build"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs(deleteDirs: true, patterns: [[pattern: 'vendor/**', type: 'EXCLUDE']])
+        }
+
+        success {
+            echo "✅ Cookbook ${EFFECTIVE_COOKBOOK} passed compliance checks"
+        }
+
+        failure {
+            echo "❌ Cookbook ${EFFECTIVE_COOKBOOK} failed compliance checks"
+        }
+    }
+}

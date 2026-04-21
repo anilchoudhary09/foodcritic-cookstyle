@@ -1,0 +1,142 @@
+# Pipeline Configuration
+#
+# This file contains configuration settings for the CI/CD pipeline.
+# Customize these values for your environment.
+
+# =============================================================================
+# Stash/Bitbucket Configuration
+# =============================================================================
+stash:
+  # Base URL for Stash/Bitbucket Server
+  base_url: "https://stash.company.com"
+
+  # SSH clone URL format
+  # Format: ssh://git@stash.company.com:7999/<PROJECT>/<REPO>.git
+  ssh_port: 7999
+
+  # Project containing Chef repositories
+  default_project: "CHEF"
+
+  # b-cookstyle-rules repository
+  rules_repo:
+    project: "CHEF"
+    repo: "b-cookstyle-rules"
+    url: "ssh://git@stash.company.com:7999/chef/b-cookstyle-rules.git"
+    branch: "master"
+
+  # Pipeline repository (this repo)
+  pipeline_repo:
+    project: "CHEF"
+    repo: "chef-ci-pipeline"
+    url: "ssh://git@stash.company.com:7999/chef/chef-ci-pipeline.git"
+    branch: "master"
+
+  # Clone timeout in seconds
+  clone_timeout: 300
+
+# =============================================================================
+# Jenkins Credentials Configuration
+# =============================================================================
+credentials:
+  # Stash SSH credentials ID (must match Jenkins credentials ID)
+  stash_credentials_id: "stash-credentials"
+
+  # Chef Server credentials ID (optional)
+  chef_server_credentials_id: "chef-server-pem"
+  ruby_version: "3.1.0"
+
+  # Target Chef version for cookbooks
+  target_chef_version: "18.0"
+
+  # Severity levels to check (info, refactor, convention, warning, error, fatal)
+  min_severity: "convention"
+
+  # Enable auto-correction by default
+  auto_correct: false
+
+  # Fail build on these severities
+  fail_on:
+    - error
+    - fatal
+
+  # Files to exclude from scanning
+  exclude_patterns:
+    - "vendor/**/*"
+    - "test/**/*"
+    - "spec/**/*"
+    - "files/**/*"
+    - "Berksfile"
+    - "Gemfile"
+
+# =============================================================================
+# Report Configuration
+# =============================================================================
+reports:
+  # Output formats to generate
+  formats:
+    - html
+    - json
+    - junit
+
+  # Archive reports for this many days
+  retention_days: 90
+
+  # Generate compliance badge
+  generate_badge: true
+
+# =============================================================================
+# Notification Configuration
+# =============================================================================
+notifications:
+  # Enable email notifications
+  email:
+    enabled: true
+    # Send on these statuses
+    on_success: true
+    on_failure: true
+    on_unstable: false
+    # Default recipients (can be overridden per job)
+    default_recipients:
+      - "chef-team@company.com"
+    # Attach report to failure emails
+    attach_report: true
+
+  # Slack notifications (if configured)
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#chef-compliance"
+    on_success: false
+    on_failure: true
+
+# =============================================================================
+# Pipeline Behavior
+# =============================================================================
+pipeline:
+  # Global timeout in minutes
+  timeout: 30
+
+  # Retry failed stages
+  retry_count: 1
+
+  # Clean workspace before build
+  clean_workspace: true
+
+  # Build concurrency (disableConcurrentBuilds)
+  allow_concurrent: false
+
+  # Number of builds to keep
+  builds_to_keep: 50
+
+# =============================================================================
+# Agent Configuration
+# =============================================================================
+agent:
+  # Jenkins agent label
+  label: "chef-workstation"
+
+  # Fallback label if primary not available
+  fallback_label: "linux"
+
+  # Docker image (if using Docker agent)
+  docker_image: "chef/chefworkstation:latest"

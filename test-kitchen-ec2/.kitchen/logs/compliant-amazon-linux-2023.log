@@ -1,0 +1,12 @@
+I, [2026-04-21T19:31:39.368586 #10186]  INFO -- compliant-amazon-linux-2023: -----> Converging <compliant-amazon-linux-2023>...
+W, [2026-04-21T19:31:39.368828 #10186]  WARN -- compliant-amazon-linux-2023: Running legacy converge for 'Proxy' Driver
+I, [2026-04-21T19:31:39.369169 #10186]  INFO -- compliant-amazon-linux-2023: Preparing files for transfer
+I, [2026-04-21T19:31:39.369233 #10186]  INFO -- compliant-amazon-linux-2023: Preparing dna.json
+I, [2026-04-21T19:31:39.369725 #10186]  INFO -- compliant-amazon-linux-2023: Resolving cookbook dependencies with Berkshelf 8.0.9...
+I, [2026-04-21T19:31:43.025462 #10186]  INFO -- compliant-amazon-linux-2023: Removing non-cookbook files before transfer
+I, [2026-04-21T19:31:43.047986 #10186]  INFO -- compliant-amazon-linux-2023: Preparing validation.pem
+I, [2026-04-21T19:31:43.048891 #10186]  INFO -- compliant-amazon-linux-2023: Preparing client.rb
+I, [2026-04-21T19:32:13.176723 #10186]  INFO -- compliant-amazon-linux-2023: [SSH] connection failed, retrying in 1 seconds (#<Net::SSH::ConnectionTimeout: Net::SSH::ConnectionTimeout>)
+I, [2026-04-21T19:32:44.189489 #10186]  INFO -- compliant-amazon-linux-2023: [SSH] connection failed, retrying in 1 seconds (#<Net::SSH::ConnectionTimeout: Net::SSH::ConnectionTimeout>)
+I, [2026-04-21T19:33:15.205083 #10186]  INFO -- compliant-amazon-linux-2023: [SSH] connection failed, retrying in 1 seconds (#<Net::SSH::ConnectionTimeout: Net::SSH::ConnectionTimeout>)
+I, [2026-04-21T19:33:46.293006 #10186]  INFO -- compliant-amazon-linux-2023: [SSH] connection failed, retrying in 1 seconds (#<Net::SSH::ConnectionTimeout: Net::SSH::ConnectionTimeout>)

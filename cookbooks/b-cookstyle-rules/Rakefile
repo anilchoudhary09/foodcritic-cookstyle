@@ -236,3 +236,64 @@ def overwrite_readme(header, footer, content)
   newlines += lines[end_line..-1]
   File.open(file, 'w') { |file| file.write(newlines.join) }
 end
+
+# =============================================================================
+# Test Kitchen Tasks for Chef Client 19 Testing
+# =============================================================================
+
+namespace :kitchen do
+  desc 'List all kitchen instances'
+  task :list do
+    sh 'kitchen list'
+  end
+
+  desc 'Create kitchen instances'
+  task :create do
+    sh 'kitchen create'
+  end
+
+  desc 'Converge kitchen instances with Chef Client 19'
+  task :converge do
+    sh 'kitchen converge'
+  end
+
+  desc 'Verify kitchen instances with InSpec'
+  task :verify do
+    sh 'kitchen verify'
+  end
+
+  desc 'Destroy kitchen instances'
+  task :destroy do
+    sh 'kitchen destroy'
+  end
+
+  desc 'Full test cycle: create, converge, verify, destroy'
+  task :test do
+    sh 'kitchen test'
+  end
+
+  desc 'Run kitchen on compliant suite only'
+  task :compliant do
+    sh 'kitchen test compliant'
+  end
+
+  desc 'Run kitchen on Amazon Linux 2023'
+  task :amazonlinux do
+    sh 'kitchen test compliant-amazonlinux-2023'
+  end
+
+  desc 'Run kitchen on RHEL 9'
+  task :rhel9 do
+    sh 'kitchen test compliant-rhel-9'
+  end
+end
+
+desc 'Run cookstyle on test fixture cookbooks'
+task :cookstyle do
+  puts 'Running cookstyle on test fixture cookbooks...'
+  sh 'cookstyle test/fixtures/cookbooks/test-compliant/'
+end
+
+desc 'Full integration test: cookstyle + kitchen converge'
+task integration: [:cookstyle, 'kitchen:test']
+

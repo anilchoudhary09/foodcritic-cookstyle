@@ -96,7 +96,7 @@
 <div class="test-case">
     <h3>2.1 Exception Configuration in rules.rb</h3>
     <p>The following paths are whitelisted for the <code>is_uisec_unix_sudo</code> cookbook:</p>
-    
+
     <pre>
 @etc_whitelist = {
   # Lines 557-578 in rules.rb
@@ -114,7 +114,7 @@
 
     <h3>2.2 Cookbook Recipe Code</h3>
     <p>File: <code>cookbooks/is_uisec_unix_sudo/recipes/default.rb</code></p>
-    
+
     <pre>
 # Manage /etc/sudoers - WHITELISTED for this cookbook
 template '/etc/sudoers' do
@@ -156,7 +156,7 @@ end</pre>
 
     <h3>2.4 Test Output</h3>
     <pre>
-2/2 files |====== 100 ======>| Time: 00:00:00 
+2/2 files |====== 100 ======>| Time: 00:00:00
 
 1  Barclays/Barc023SupportedPlatform
 1  Barclays/Barc024MaintainerInfo
@@ -208,7 +208,7 @@ end</pre>
 <div class="test-case">
     <h3>3.1 Exception Configuration in rules.rb</h3>
     <p>The <code>mysql</code> and <code>mysqld</code> services are configured with empty arrays, meaning ALL cookbooks can manage them:</p>
-    
+
     <pre>
 @restricted_services = {
   # Lines 103-104 in rules.rb
@@ -226,7 +226,7 @@ end</pre>
 
     <h3>3.2 Cookbook Recipe Code</h3>
     <p>File: <code>cookbooks/mysql/recipes/default.rb</code></p>
-    
+
     <pre>
 # Install MySQL packages
 package 'mysql-server' do
@@ -263,7 +263,7 @@ end</pre>
 
     <h3>3.4 Test Output</h3>
     <pre>
-2/2 files |====== 100 ======>| Time: 00:00:00 
+2/2 files |====== 100 ======>| Time: 00:00:00
 
 1  Barclays/Barc023SupportedPlatform
 1  Barclays/Barc024MaintainerInfo

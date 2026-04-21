@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Adding Exceptions to rules.rb - Administrator Guide</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #172B4D; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { color: #0052CC; border-bottom: 3px solid #0052CC; padding-bottom: 10px; }
+        h2 { color: #172B4D; border-bottom: 2px solid #DFE1E6; padding-bottom: 8px; margin-top: 40px; }
+        h3 { color: #42526E; margin-top: 25px; }
+        h4 { color: #5E6C84; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th { background-color: #0052CC; color: white; padding: 12px 15px; text-align: left; }
+        td { border: 1px solid #DFE1E6; padding: 10px 15px; }
+        tr:nth-child(even) { background-color: #F4F5F7; }
+        code { background-color: #F4F5F7; padding: 2px 6px; border-radius: 3px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; color: #172B4D; }
+        pre { background-color: #172B4D; color: #B3BAC5; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 12px; }
+        pre code { background-color: transparent; color: #B3BAC5; padding: 0; }
+        .info-box { background-color: #DEEBFF; border-left: 4px solid #0052CC; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .success-box { background-color: #E3FCEF; border-left: 4px solid #00875A; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .warning-box { background-color: #FFFAE6; border-left: 4px solid #FF8B00; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .error-box { background-color: #FFEBE6; border-left: 4px solid #DE350B; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+        .highlight { background-color: #E3FCEF; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        .toc { background-color: #F4F5F7; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        .toc ul { margin: 0; padding-left: 20px; }
+        .toc li { margin: 5px 0; }
+        .toc a { color: #0052CC; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .section { margin-bottom: 40px; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; margin-right: 5px; }
+        .badge-blue { background-color: #0052CC; color: white; }
+        .badge-green { background-color: #00875A; color: white; }
+        .badge-orange { background-color: #FF8B00; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>Adding Exceptions to rules.rb - Administrator Guide</h1>
+
+<div class="info-box">
+    <strong>File Location:</strong> <code>cookbooks/b-cookstyle-rules/rules.rb</code><br>
+    <strong>Purpose:</strong> Defines security exceptions for Cookstyle BARC cops
+</div>
+
+<div class="toc">
+    <strong>Table of Contents</strong>
+    <ul>
+        <li><a href="#quick-reference">Quick Reference</a></li>
+        <li><a href="#service-exception">1. Adding a Service Exception (@restricted_services)</a></li>
+        <li><a href="#etc-whitelist">2. Adding an /etc Path Exception (@etc_whitelist)</a></li>
+        <li><a href="#etc-blacklist">3. Blocking an /etc Path (@etc_blacklist)</a></li>
+        <li><a href="#system-services">4. Adding a System Service (@system_services)</a></li>
+        <li><a href="#attribute-exception">5. Adding an Attribute Exception (@restricted_attributes)</a></li>
+        <li><a href="#command-exception">6. Adding a Command Exception (@cmd_whitelist)</a></li>
+        <li><a href="#platform-cookbook">7. Adding a Platform Cookbook (@platform_cookbook_whitelist)</a></li>
+        <li><a href="#change-process">Change Request Process</a></li>
+        <li><a href="#testing">Testing Your Exception</a></li>
+        <li><a href="#scenarios">Common Scenarios</a></li>
+    </ul>
+</div>
+
+<div class="section" id="quick-reference">
+<h2>Quick Reference</h2>
+
+<table>
+    <tr>
+        <th>Section</th>
+        <th>Purpose</th>
+        <th>Format</th>
+        <th>Empty Array <code>[]</code> Meaning</th>
+    </tr>
+    <tr>
+        <td><code>@system_services</code></td>
+        <td>Protected system services</td>
+        <td>Array</td>
+        <td>N/A (just a list)</td>
+    </tr>
+    <tr>
+        <td><code>@restricted_services</code></td>
+        <td>Service management restrictions</td>
+        <td>Hash → Array</td>
+        <td><span class="highlight">All cookbooks allowed</span></td>
+    </tr>
+    <tr>
+        <td><code>@etc_whitelist</code></td>
+        <td>/etc paths allowed per cookbook</td>
+        <td>Hash → Array</td>
+        <td><span class="highlight">All cookbooks allowed</span></td>
+    </tr>
+    <tr>
+        <td><code>@etc_blacklist</code></td>
+        <td>/etc paths blocked for ALL</td>
+        <td>Array</td>
+        <td>N/A (blocked list)</td>
+    </tr>
+    <tr>
+        <td><code>@restricted_attributes</code></td>
+        <td>Attribute restrictions</td>
+        <td>Hash → Array</td>
+        <td><span class="highlight">All cookbooks allowed</span></td>
+    </tr>
+    <tr>
+        <td><code>@cmd_whitelist</code></td>
+        <td>Shell commands allowed</td>
+        <td>Hash → Array</td>
+        <td><span class="highlight">All cookbooks allowed</span></td>
+    </tr>
+    <tr>
+        <td><code>@platform_cookbook_whitelist</code></td>
+        <td>Platform cookbooks bypass</td>
+        <td>Array</td>
+        <td>N/A (just a list)</td>
+    </tr>
+</table>
+</div>
+
+<div class="section" id="service-exception">
+<h2>1. Adding a Service Exception (<code>@restricted_services</code>)</h2>
+
+<p><span class="badge badge-blue">Rule Enforced:</span> <code>BARC017 - NoSystemServices</code></p>
+
+<h3>When to Use</h3>
+<p>When a cookbook needs to manage a service that would otherwise be blocked.</p>
+
+<h3>Format</h3>
+<pre><code>@restricted_services = {
+  'service_name' => ['cookbook1', 'cookbook2'],  # Specific cookbooks allowed
+  'other_service' => [],                          # ALL cookbooks allowed
+}</code></pre>
+
+<h3>Adding a New Exception</h3>
+
+<h4>To allow a specific cookbook to manage a service:</h4>
+<pre><code>'new_service' => ['my_cookbook_name'],  # CHG1234567890 - Your change number</code></pre>
+
+<h4>To allow ALL cookbooks to manage a service:</h4>
+<pre><code>'new_service' => [],  # CHG1234567890 - Your change number</code></pre>
+
+<h3>Example</h3>
+<pre><code>@restricted_services = {
+  # ... existing entries ...
+
+  # NEW: Allow app_my_team_service cookbook to manage custom-app service
+  'custom-app' => ['app_my_team_service'],  # CHG1234567890 Application service
+
+  # NEW: Allow ANY cookbook to manage my-generic-service
+  'my-generic-service' => [],  # CHG1234567891 Generic service for all
+}</code></pre>
+
+<div class="warning-box">
+    <strong>Important Notes:</strong>
+    <ul>
+        <li>Always include the Change Request number as a comment</li>
+        <li>Service names are <strong>case-sensitive</strong></li>
+        <li>Partial matches work (e.g., <code>'tomcat@'</code> matches <code>tomcat@instance1</code>)</li>
+    </ul>
+</div>
+</div>
+
+<div class="section" id="etc-whitelist">
+<h2>2. Adding an /etc Path Exception (<code>@etc_whitelist</code>)</h2>
+
+<p><span class="badge badge-blue">Rule Enforced:</span> <code>BARC005 - EtcBlacklist</code></p>
+
+<h3>When to Use</h3>
+<p>When a cookbook needs to modify a file under <code>/etc/</code> that would otherwise be blocked.</p>
+
+<h3>Format</h3>
+<pre><code>@etc_whitelist = {
+  '/etc/path/to/file' => ['cookbook1', 'cookbook2'],  # Specific cookbooks
+  '/etc/some/directory/' => [],                        # ALL cookbooks (note trailing /)
+}</code></pre>
+
+<h3>Adding a New Exception</h3>
+
+<h4>To allow a specific cookbook to modify an /etc path:</h4>
+<pre><code>'/etc/my/config.conf' => ['my_cookbook'],  # CHG1234567890 - Description</code></pre>
+
+<h4>To allow ALL cookbooks to modify an /etc path:</h4>
+<pre><code>'/etc/common/config.d/' => [],  # CHG1234567890 - Description</code></pre>
+
+<h3>Example</h3>
+<pre><code>@etc_whitelist = {
+  # ... existing entries ...
+
+  # NEW: Allow my_app_cookbook to modify application config
+  '/etc/myapp/config.yaml' => ['my_app_cookbook'],  # CHG1234567890 App config
+
+  # NEW: Allow my_app_cookbook to modify any file in /etc/myapp/conf.d/
+  '/etc/myapp/conf.d/' => ['my_app_cookbook'],  # CHG1234567890 App config directory
+
+  # NEW: Allow ANY cookbook to use /etc/custom/
+  '/etc/custom/' => [],  # CHG1234567891 Custom configs for all
+}</code></pre>
+
+<div class="warning-box">
+    <strong>Important Notes:</strong>
+    <ul>
+        <li>Paths ending with <code>/</code> match any file in that directory</li>
+        <li>Exact file paths require exact matches</li>
+        <li>Always check <code>@etc_blacklist</code> first - if path is blacklisted, it takes precedence unless whitelisted</li>
+        <li>Include Change Request number as comment</li>
+    </ul>
+</div>
+</div>
+
+<div class="section" id="etc-blacklist">
+<h2>3. Blocking an /etc Path for ALL Cookbooks (<code>@etc_blacklist</code>)</h2>
+
+<p><span class="badge badge-blue">Rule Enforced:</span> <code>BARC005 - EtcBlacklist</code></p>
+
+<h3>When to Use</h3>
+<p>When an /etc path should NEVER be modified by ANY cookbook (security/system critical files).</p>
+
+<h3>Format</h3>
+<pre><code>@etc_blacklist = [
+  '/etc/critical/path',
+  '/etc/critical/directory/',
+]</code></pre>
+
+<h3>Adding a New Blacklist Entry</h3>
+<pre><code>@etc_blacklist = [
+  # ... existing entries ...
+  '/etc/new/critical/file',  # Reason for blacklisting
+]</code></pre>
+
+<div class="error-box">
+    <strong>Important Notes:</strong>
+    <ul>
+        <li><strong>Blacklist takes precedence</strong> unless specifically whitelisted for a cookbook</li>
+        <li>Use sparingly - this blocks ALL cookbooks</li>
+        <li>Cannot be overridden by <code>@etc_whitelist</code> unless cookbook is explicitly listed</li>
+    </ul>
+</div>
+</div>
+
+<div class="section" id="system-services">
+<h2>4. Adding a System Service (<code>@system_services</code>)</h2>
+
+<p><span class="badge badge-blue">Rule Enforced:</span> <code>BARC017 - NoSystemServices</code></p>
+
+<h3>When to Use</h3>
+<p>When a new system service should be protected from ALL cookbooks.</p>
+
+<h3>Format</h3>
+<pre><code>@system_services = %w[
+  service1
+  service2
+  sshd
+  ntpd
+]</code></pre>
+
+<h3>Adding a Protected System Service</h3>
+<pre><code>@system_services = %w[
+  # ... existing entries ...
+  new_protected_service  # Reason for protection
+]</code></pre>
+
+<div class="warning-box">
+    <strong>Important Notes:</strong>
+    <ul>
+        <li>System services are <strong>blocked for ALL cookbooks</strong></li>
+        <li>To allow a cookbook to manage a system service, add to <code>@restricted_services</code> with the cookbook name</li>
+        <li>Examples: <code>sshd</code>, <code>ntpd</code>, <code>sssd</code>, <code>sendmail</code></li>
+    </ul>
+</div>
+</div>
+
+<div class="section" id="attribute-exception">
+<h2>5. Adding an Attribute Exception (<code>@restricted_attributes</code>)</h2>
+
+<h3>When to Use</h3>
+<p>When a cookbook needs to set a restricted attribute.</p>
+
+<h3>Format</h3>
+<pre><code>@restricted_attributes = {
+  'attribute_name' => ['cookbook1', 'cookbook2'],
+}</code></pre>
+
+<h3>Example</h3>
+<pre><code>@restricted_attributes = {
+  # ... existing entries ...
+
+  'enable_custom_feature' => ['my_cookbook'],  # CHG1234567890 Feature flag
+}</code></pre>
+</div>
+
+<div class="section" id="command-exception">
+<h2>6. Adding a Command Exception (<code>@cmd_whitelist</code>)</h2>
+
+<h3>When to Use</h3>
+<p>When a cookbook needs to run a specific shell command that would otherwise be flagged.</p>
+
+<h3>Format</h3>
+<pre><code>@cmd_whitelist = {
+  'exact command string' => ['cookbook1', 'cookbook2'],
+  'another command' => [],  # ALL cookbooks allowed
+}</code></pre>
+
+<h3>Example</h3>
+<pre><code>@cmd_whitelist = {
+  # ... existing entries ...
+
+  # Allow specific cookbook to run yum install
+  'yum install -y mypackage' => ['my_cookbook'],  # CHG1234567890
+
+  # Allow all cookbooks to run this command
+  'systemctl daemon-reload' => [],  # CHG1234567891
+}</code></pre>
+
+<div class="warning-box">
+    <strong>Important Notes:</strong>
+    <ul>
+        <li>Commands must match <strong>exactly</strong></li>
+        <li>Multi-line commands are supported (use heredoc-style)</li>
+    </ul>
+</div>
+</div>
+
+<div class="section" id="platform-cookbook">
+<h2>7. Adding a Platform Cookbook (<code>@platform_cookbook_whitelist</code>)</h2>
+
+<h3>When to Use</h3>
+<p>When a cookbook is a platform/infrastructure cookbook that needs to bypass certain checks.</p>
+
+<h3>Format</h3>
+<pre><code>@platform_cookbook_whitelist = [
+  'platform_cookbook_1',
+  'platform_cookbook_2',
+]</code></pre>
+
+<h3>Example</h3>
+<pre><code>@platform_cookbook_whitelist = [
+  # ... existing entries ...
+
+  'my_platform_cookbook',  # CHG1234567890 New platform cookbook
+]</code></pre>
+</div>
+
+<div class="section" id="change-process">
+<h2>Change Request Process</h2>
+
+<h3>Required Information</h3>
+<table>
+    <tr>
+        <th>Field</th>
+        <th>Description</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>Change Request Number</td>
+        <td>ServiceNow CR number</td>
+        <td><code>CHG1234567890</code></td>
+    </tr>
+    <tr>
+        <td>Cookbook Name</td>
+        <td>Exact name from <code>metadata.rb</code></td>
+        <td><code>app_my_team_myapp</code></td>
+    </tr>
+    <tr>
+        <td>Exception Type</td>
+        <td>Service, /etc path, command, etc.</td>
+        <td>Service Exception</td>
+    </tr>
+    <tr>
+        <td>Justification</td>
+        <td>Why is this exception needed</td>
+        <td>Application requires custom service</td>
+    </tr>
+    <tr>
+        <td>Security Review</td>
+        <td>Required for sensitive paths/services</td>
+        <td>Approved by Security Team</td>
+    </tr>
+</table>
+
+<h3>Format for Comments</h3>
+<pre><code># Standard format
+'resource' => ['cookbook'],  # CHG1234567890 Brief description</code></pre>
+
+<div class="error-box">
+    <strong>For Middleware Services - Approval Required:</strong><br>
+    <code>Email: PaaSMiddlewareEngineering@barclayscorp.com</code><br>
+    Attach email approval to Change Request. All unapproved cookbooks will be removed without notice.
+</div>
+</div>
+
+<div class="section" id="testing">
+<h2>Testing Your Exception</h2>
+
+<p>After adding an exception, test it:</p>
+
+<pre><code># Navigate to your cookbook
+cd cookbooks/your_cookbook
+
+# Run Cookstyle with the rules
+cookstyle . --config ../b-cookstyle-rules/.rubocop.yml
+
+# Expected: No BARC violations for the whitelisted resource</code></pre>
+
+<div class="success-box">
+    <strong>Success Criteria:</strong> No BARC violations for the resources you whitelisted.
+</div>
+</div>
+
+<div class="section" id="scenarios">
+<h2>Common Scenarios</h2>
+
+<table>
+    <tr>
+        <th>Scenario</th>
+        <th>Section to Modify</th>
+        <th>Code Example</th>
+    </tr>
+    <tr>
+        <td>New Application Service</td>
+        <td><code>@restricted_services</code></td>
+        <td><code>'my-app-service' => ['app_my_team_myapp'],  # CHG1234567890</code></td>
+    </tr>
+    <tr>
+        <td>Application Config File</td>
+        <td><code>@etc_whitelist</code></td>
+        <td><code>'/etc/myapp/config.yaml' => ['app_my_team_myapp'],  # CHG1234567890</code></td>
+    </tr>
+    <tr>
+        <td>Directory of Configs</td>
+        <td><code>@etc_whitelist</code></td>
+        <td><code>'/etc/myapp/conf.d/' => ['app_my_team_myapp'],  # CHG1234567890</code></td>
+    </tr>
+    <tr>
+        <td>Multiple Cookbooks Same Resource</td>
+        <td><code>@etc_whitelist</code> or <code>@restricted_services</code></td>
+        <td><code>'/etc/shared/config' => ['cookbook1', 'cookbook2', 'cookbook3'],  # CHG1234567890</code></td>
+    </tr>
+    <tr>
+        <td>Any Cookbook Can Use</td>
+        <td>Any Hash section</td>
+        <td><code>'generic-service' => [],  # CHG1234567890 All cookbooks allowed</code></td>
+    </tr>
+</table>
+</div>
+
+<div class="section">
+<h2>File Structure Summary</h2>
+
+<pre><code># rules.rb Structure
+
+@system_services = %w[           # Array - Protected services (blocked for all)
+  sshd
+  ntpd
+]
+
+@restricted_attributes = {       # Hash - Attribute restrictions
+  'attr_name' => ['cookbook'],
+}
+
+@restricted_services = {         # Hash - Service exceptions
+  'service' => ['cookbook'],     # Specific cookbook allowed
+  'service2' => [],              # ALL cookbooks allowed
+}
+
+@etc_whitelist = {               # Hash - /etc path exceptions
+  '/etc/path' => ['cookbook'],   # Specific cookbook allowed
+  '/etc/dir/' => [],             # ALL cookbooks allowed (note /)
+}
+
+@etc_blacklist = [               # Array - /etc paths blocked for ALL
+  '/etc/passwd',
+  '/etc/shadow',
+]
+
+@cmd_whitelist = {               # Hash - Command exceptions
+  'command' => ['cookbook'],
+}
+
+@platform_cookbook_whitelist = [ # Array - Platform cookbooks
+  'platform_cookbook',
+]</code></pre>
+</div>
+
+<hr>
+<p style="color: #5E6C84; font-size: 12px;">
+    <em>Document Version: 1.0 | Last Updated: 15 April 2026 | Author: Chef Platform Team</em>
+</p>
+
+</body>
+</html>

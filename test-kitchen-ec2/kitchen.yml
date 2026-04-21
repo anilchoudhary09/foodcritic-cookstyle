@@ -1,7 +1,7 @@
 # Test Kitchen Configuration for Existing EC2 Instance
 #
 # This configuration connects to an existing EC2 instance with Chef Workstation 25
-# and runs kitchen converge with Chef Client 19
+# and runs kitchen converge with Chef Client 18/19
 #
 # Usage:
 #   cd test-kitchen-ec2
@@ -9,19 +9,25 @@
 #   kitchen converge
 #   kitchen verify
 #
+# Environment Variables (optional):
+#   EC2_HOST      - EC2 instance hostname
+#   SSH_KEY_PATH  - Path to SSH private key
+#   SSH_USER      - SSH username (default: ec2-user)
+#
 # To run cookstyle first:
 #   cookstyle ../cookbooks/compliant-cookbook --config ../cookbooks/b-cookstyle-rules/.rubocop.yml
 
 ---
 driver:
   name: proxy
-  host: ec2-13-203-101-198.ap-south-1.compute.amazonaws.com
+  host: <%= ENV['EC2_HOST'] || 'ec2-13-203-101-198.ap-south-1.compute.amazonaws.com' %>
   port: 22
 
 provisioner:
   name: chef_infra
   product_name: chef
-  product_version: 19           # Chef Client 19
+  product_version: 18           # Chef Client 18 (already installed on EC2)
+  install_strategy: skip        # Skip Chef installation - already installed
   chef_license: accept-silent
   log_level: info
   always_update_cookbooks: true
@@ -31,13 +37,20 @@ verifier:
 
 transport:
   name: ssh
-  username: ec2-user
-  ssh_key: /Users/achoudha/Documents/AWSKeys/anil-aws-mumbai.pem
-  connection_timeout: 30
-  connection_retries: 5
+  username: <%= ENV['SSH_USER'] || 'ec2-user' %>
+  ssh_key: <%= ENV['SSH_KEY_PATH'] || '/Users/achoudha/Documents/AWSKeys/anil-aws-mumbai.pem' %>
+  connection_timeout: 60
+  connection_retries: 10
+  max_ssh_sessions: 5
+  keepalive: true
+  keepalive_interval: 30
 
 platforms:
   - name: amazon-linux-2023
+    driver:
+      host: <%= ENV['EC2_HOST'] || 'ec2-13-203-101-198.ap-south-1.compute.amazonaws.com' %>
+    transport:
+      hostname: <%= ENV['EC2_HOST'] || 'ec2-13-203-101-198.ap-south-1.compute.amazonaws.com' %>
 
 suites:
   - name: compliant

@@ -1,0 +1,271 @@
+// Jenkinsfile for Test Kitchen EC2 Convergence Testing
+//
+// This pipeline runs cookstyle validation with BARC rules followed by
+// Test Kitchen converge on an existing EC2 instance
+//
+// Prerequisites:
+//   - Chef Workstation installed on Jenkins agent
+//   - AWS credentials configured
+//   - SSH key for EC2 access stored in Jenkins credentials
+
+pipeline {
+    agent any
+
+    environment {
+        // EC2 Instance Configuration
+        EC2_HOST = credentials('ec2-kitchen-host') // Store hostname in Jenkins credentials
+        SSH_KEY = credentials('ec2-ssh-key')       // SSH private key credential
+        SSH_USER = 'ec2-user'
+        
+        // Chef Configuration
+        CHEF_LICENSE = 'accept-silent'
+        
+        // Paths
+        COOKBOOK_PATH = "${WORKSPACE}/cookbooks"
+        BARC_RULES_PATH = "${WORKSPACE}/cookbooks/b-cookstyle-rules"
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+        timeout(time: 30, unit: 'MINUTES')
+        ansiColor('xterm')
+    }
+
+    parameters {
+        choice(
+            name: 'SUITE',
+            choices: ['compliant', 'my-app', 'all'],
+            description: 'Test Kitchen suite to run'
+        )
+        choice(
+            name: 'ACTION',
+            choices: ['converge', 'verify', 'test', 'destroy'],
+            description: 'Test Kitchen action to perform'
+        )
+        booleanParam(
+            name: 'RUN_COOKSTYLE',
+            defaultValue: true,
+            description: 'Run Cookstyle with BARC rules before converge'
+        )
+        string(
+            name: 'COOKBOOK_TO_TEST',
+            defaultValue: 'compliant-cookbook',
+            description: 'Cookbook to validate with Cookstyle'
+        )
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'ls -la'
+            }
+        }
+
+        stage('Environment Setup') {
+            steps {
+                script {
+                    // Verify Chef Workstation
+                    sh '''
+                        echo "=== Chef Workstation Version ==="
+                        chef --version || { echo "Chef Workstation not found!"; exit 1; }
+                        
+                        echo "=== Ruby Version ==="
+                        chef exec ruby --version
+                        
+                        echo "=== Test Kitchen Version ==="
+                        chef exec kitchen version
+                    '''
+                }
+            }
+        }
+
+        stage('Cookstyle Validation') {
+            when {
+                expression { params.RUN_COOKSTYLE == true }
+            }
+            steps {
+                script {
+                    def cookbook = params.COOKBOOK_TO_TEST
+                    echo "Running Cookstyle with BARC rules on ${cookbook}"
+                    
+                    sh """
+                        echo "=== Cookstyle BARC Rules Validation ==="
+                        echo "Cookbook: ${cookbook}"
+                        echo ""
+                        
+                        cd ${WORKSPACE}
+                        
+                        # Run cookstyle with BARC rules
+                        chef exec cookstyle cookbooks/${cookbook} \\
+                            --config cookbooks/b-cookstyle-rules/.rubocop.yml \\
+                            --format progress \\
+                            --format json --out cookstyle-report.json || true
+                        
+                        # Generate HTML report
+                        echo "Generating Cookstyle report..."
+                        
+                        # Display summary
+                        echo ""
+                        echo "=== Cookstyle Summary ==="
+                        chef exec cookstyle cookbooks/${cookbook} \\
+                            --config cookbooks/b-cookstyle-rules/.rubocop.yml \\
+                            --format simple || true
+                    """
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'cookstyle-report.json', allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage('Prepare Kitchen Config') {
+            steps {
+                script {
+                    // Create kitchen.yml with Jenkins credentials
+                    sh '''
+                        cd ${WORKSPACE}/test-kitchen-ec2
+                        
+                        # Create kitchen.local.yml with credentials
+                        cat > kitchen.local.yml << EOF
+---
+transport:
+  ssh_key: ${SSH_KEY}
+  
+driver:
+  host: ${EC2_HOST}
+  
+platforms:
+  - name: amazon-linux-2023
+    driver:
+      host: ${EC2_HOST}
+    transport:
+      hostname: ${EC2_HOST}
+EOF
+                        
+                        echo "Kitchen configuration prepared"
+                        cat kitchen.local.yml
+                    '''
+                }
+            }
+        }
+
+        stage('Resolve Dependencies') {
+            steps {
+                sh '''
+                    cd ${WORKSPACE}/test-kitchen-ec2
+                    
+                    echo "=== Resolving Cookbook Dependencies ==="
+                    rm -rf cookbooks
+                    chef exec berks vendor cookbooks
+                    
+                    echo ""
+                    echo "=== Vendored Cookbooks ==="
+                    ls -la cookbooks/
+                '''
+            }
+        }
+
+        stage('Kitchen List') {
+            steps {
+                sh '''
+                    cd ${WORKSPACE}/test-kitchen-ec2
+                    
+                    echo "=== Available Kitchen Instances ==="
+                    chef exec kitchen list
+                '''
+            }
+        }
+
+        stage('Kitchen Converge') {
+            steps {
+                script {
+                    def suite = params.SUITE
+                    def action = params.ACTION
+                    def instance = suite == 'all' ? '' : "${suite}-amazon-linux-2023"
+                    
+                    echo "Running kitchen ${action} on ${suite == 'all' ? 'all instances' : instance}"
+                    
+                    sh """
+                        cd ${WORKSPACE}/test-kitchen-ec2
+                        
+                        echo "=============================================="
+                        echo "  Test Kitchen ${action.toUpperCase()}"
+                        echo "  Instance: ${instance ?: 'ALL'}"
+                        echo "  EC2 Host: \${EC2_HOST}"
+                        echo "=============================================="
+                        echo ""
+                        
+                        # Run kitchen action
+                        chef exec kitchen ${action} ${instance} --color
+                        
+                        echo ""
+                        echo "=============================================="
+                        echo "  Kitchen ${action.toUpperCase()} Complete!"
+                        echo "=============================================="
+                    """
+                }
+            }
+        }
+
+        stage('Kitchen Status') {
+            steps {
+                sh '''
+                    cd ${WORKSPACE}/test-kitchen-ec2
+                    
+                    echo "=== Final Kitchen Status ==="
+                    chef exec kitchen list
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Archive kitchen logs
+                sh '''
+                    cd ${WORKSPACE}/test-kitchen-ec2
+                    
+                    if [ -d ".kitchen/logs" ]; then
+                        echo "Archiving kitchen logs..."
+                        tar -czf kitchen-logs.tar.gz .kitchen/logs/
+                    fi
+                '''
+                
+                archiveArtifacts artifacts: 'test-kitchen-ec2/kitchen-logs.tar.gz', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'test-kitchen-ec2/.kitchen/logs/*.log', allowEmptyArchive: true
+            }
+        }
+        
+        success {
+            echo '''
+╔══════════════════════════════════════════════════════════════╗
+║                    ✅ BUILD SUCCESSFUL                        ║
+║                                                              ║
+║  Cookstyle validation and Kitchen converge completed!        ║
+╚══════════════════════════════════════════════════════════════╝
+'''
+        }
+        
+        failure {
+            echo '''
+╔══════════════════════════════════════════════════════════════╗
+║                    ❌ BUILD FAILED                            ║
+║                                                              ║
+║  Check the logs above for error details.                     ║
+╚══════════════════════════════════════════════════════════════╝
+'''
+        }
+        
+        cleanup {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true)
+        }
+    }
+}

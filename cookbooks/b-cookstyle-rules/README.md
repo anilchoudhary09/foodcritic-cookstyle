@@ -1,114 +1,190 @@
-# Barclays Foodcritic Rules
+# Barclays Cookstyle Rules (b-cookstyle-rules)
 
-These are the evolving foodcritic rules we've written here at Barclays to enforce rules on our cookbooks. These rules are to help ensure that any cookbook that goes to production:
+Custom Cookstyle cops enforcing Barclays infrastructure security policies for Chef cookbooks.
 
-1. Does not do anything that will break our infrastructure.
-2. Follows our cookbook development standard.
+## Overview
 
-These rules are expected to run while one is developing a cookbook. Thus, a cookbook developer will get feedback on whether she is breaking a rule much early in the lifecycle and will fix any violation while she is writing the cookbook. When the cookbook reaches the final review, most problems should have already been detected and fixed. This will help to reduce both the the rejection rate and effort in the final manual review, hence, help to shorten the cookbook development cycle.
+These rules ensure that any cookbook going to production:
+
+1. Does not break our infrastructure
+2. Follows our cookbook development standards
+3. Respects team ownership boundaries (Middleware, Infrastructure, etc.)
+
+**36 BARC rules** are enforced, with an **enterprise exception mechanism** allowing per-cookbook/per-path/per-service bypasses.
 
 ---
 
-# 🆕 Cookstyle Migration (Modern Approach)
-
-Foodcritic is **deprecated** and no longer maintained. We have migrated all BARC rules to **Cookstyle** (RuboCop-based linting).
-
-## Quick Start - One Command
+## Quick Start
 
 ```bash
-# Install dependencies (one time)
-bundle install
+# Run ALL checks (200+ Cookstyle + 36 BARC rules)
+cookstyle --only Barclays cookbooks/your-cookbook
 
-# Run ALL checks (standard Cookstyle + custom BARC rules)
-cookstyle .
-
-# Auto-fix correctable issues
-cookstyle --autocorrect .
-
-# Check a specific cookbook
-cookstyle /path/to/your/cookbook
+# Run with standard Cookstyle rules too
+cookstyle cookbooks/your-cookbook
 
 # JSON output for CI/CD
-cookstyle --format json --out report.json .
+cookstyle --only Barclays --format json --out report.json cookbooks/your-cookbook
 
-# HTML report
-cookstyle --format html --out report.html .
+# Check specific cookbook with config
+cookstyle cookbooks/your-cookbook --config cookbooks/b-cookstyle-rules/.rubocop.yml
 ```
 
-## What You Get
+---
 
-Running `cookstyle .` validates against:
+## Architecture
 
-| Category | Description |
-|----------|-------------|
-| **200+ Cookstyle Rules** | Modern Chef best practices, deprecations, security |
-| **BARC001-BARC019** | Custom organization security policies |
-| **Auto-correction** | Many violations can be auto-fixed |
-| **Multiple Formats** | Progress, JSON, HTML, JUnit for CI/CD |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        .rubocop.yml                              │
+│              (Configuration - loads barc_cops.rb)                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       barc_cops.rb                               │
+│                    (1,446 lines - ENGINE)                        │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ BarcRulesEngine Module                                   │    │
+│  │ - Loads data from rules.rb                               │    │
+│  │ - Provides bypass/whitelist checking methods             │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ 36 BARC Cop Classes (Barc001-Barc036)                    │    │
+│  │ - Each cop checks for specific violations                │    │
+│  │ - Uses BarcRulesEngine for exception logic               │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         rules.rb                                 │
+│                    (2,835 lines - DATA)                          │
+│  Part 1 (Lines 1-1767): @ variable data - ACTIVELY USED         │
+│  - @system_services, @restricted_services                        │
+│  - @etc_whitelist, @etc_blacklist                                │
+│  - @platform_cookbook_whitelist, @tag_whitelist                  │
+│  - @mw_pkg_prefixes, @mw_pkg_whitelist                           │
+│  - @restricted_cookbook_whitelist, @community_cookbook_whitelist │
+│  Part 2 (Lines 1768-2835): Deprecated Foodcritic rules          │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-## Custom BARC Rules (Cookstyle)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `Barclays/Barc001NoLocalUsers` | Error | No local user manipulation |
-| `Barclays/Barc002NoLocalGroups` | Error | No local group manipulation |
-| `Barclays/Barc003NoRootSsh` | Error | No root .ssh manipulation |
-| `Barclays/Barc005EtcBlacklist` | Error | Protected /etc files |
-| `Barclays/Barc006NoReboot` | Error | No reboot/shutdown commands |
-| `Barclays/Barc007NoSelinux` | Error | No SELinux manipulation |
-| `Barclays/Barc008NoKillProcess` | Warning | No kill/renice commands |
-| `Barclays/Barc009NoFirewall` | Error | No firewall manipulation |
-| `Barclays/Barc011NoRemoveFiles` | Warning | No rm -rf patterns |
-| `Barclays/Barc016UseChefResources` | Convention | Prefer Chef resources |
-| `Barclays/Barc017NoSystemServices` | Error | Protected system services |
-| `Barclays/Barc019NoFindSudo` | Error | No dangerous patterns |
+---
 
 ## Directory Structure
 
 ```
 b-cookstyle-rules/
-├── .rubocop.yml              # Main config - loads custom cops
-├── Gemfile                   # Dependencies (cookstyle)
-├── rules.rb                  # Legacy Foodcritic rules (deprecated)
-├── test_recipe.rb            # Sample recipe to test violations
-│
-└── lib/
-    ├── rubocop/cop/
-    │   ├── barclays_cops.rb  # Entry point - loads all cops
-    │   └── barclays/         # Custom BARC cops
-    │       ├── base.rb
-    │       ├── barc001_no_local_users.rb
-    │       ├── barc002_no_local_groups.rb
-    │       └── ... (more cops)
-    │
-    └── data/                 # Whitelist configurations
-        ├── platform_cookbooks.yml
-        ├── services.yml
-        └── etc_whitelist.yml
+├── .rubocop.yml          # Cookstyle config - loads barc_cops.rb
+├── barc_cops.rb          # 36 BARC cops + BarcRulesEngine (1,446 lines)
+├── rules.rb              # Whitelist/exception data (ACTIVE, not deprecated!)
+├── Rakefile              # Rake tasks for testing
+├── spec/                 # RSpec tests
+└── README.md             # This file
 ```
 
-## Using in Your Cookbook
+---
 
-**No `.rubocop.yml` needed!** Just run cookstyle with `--config` flag:
+## All 36 BARC Rules
 
-```bash
-# From your cookbook directory
-cookstyle . --config ../b-cookstyle-rules/.rubocop.yml
+### Security Rules (Infrastructure Protection)
 
-# With auto-fix
-cookstyle . --config ../b-cookstyle-rules/.rubocop.yml --autocorrect
+| Rule | Cop Name | Description |
+|------|----------|-------------|
+| BARC001 | `Barclays::Barc001NoLocalUsers` | No local user manipulation (use AD) |
+| BARC002 | `Barclays::Barc002NoLocalGroups` | No local group manipulation (use AD) |
+| BARC003 | `Barclays::Barc003NoRootSsh` | No /root/.ssh manipulation |
+| BARC004 | `Barclays::Barc004NoSshKeys` | No SSH key manipulation for any user |
+| BARC005 | `Barclays::Barc005EtcBlacklist` | Protected /etc files blacklist |
+| BARC005a | `Barclays::Barc005aEtcAttributes` | No /etc paths in attributes |
+| BARC006 | `Barclays::Barc006NoReboot` | No halt/shutdown/reboot/poweroff |
+| BARC007 | `Barclays::Barc007NoSelinux` | No SELinux manipulation |
+| BARC008 | `Barclays::Barc008NoKillProcess` | No kill/pkill/renice commands |
+| BARC009 | `Barclays::Barc009NoFirewall` | No firewall manipulation |
+| BARC010 | `Barclays::Barc010NoInitTelinit` | No init/telinit commands |
+| BARC011 | `Barclays::Barc011NoRemoveFiles` | No rm/rmdir/dd commands |
+| BARC012 | `Barclays::Barc012NoKernelManipulation` | No kernel manipulation |
+| BARC013 | `Barclays::Barc013NoVolumeMount` | No volume/partition manipulation |
+| BARC014 | `Barclays::Barc014NoNetworkConfig` | No network configuration |
+| BARC015 | `Barclays::Barc015NoRootCron` | No root cron manipulation |
+| BARC019 | `Barclays::Barc019NoFindSudo` | No find/sudo commands |
+| BARC020 | `Barclays::Barc020NoMiscCommands` | No fuser/setfacl/wall/smbclient |
+| BARC022 | `Barclays::Barc022NoChefExit` | No raise/fail/Chef::Application.fatal! |
+| BARC025 | `Barclays::Barc025NodeTagsWhitelist` | Only whitelisted node tags |
+| BARC026 | `Barclays::Barc026NoNodeSave` | No node.save method |
 
-# JSON output for CI/CD
-cookstyle . --config ../b-cookstyle-rules/.rubocop.yml --format json --out report.json
+### Service Management Rules
 
-# From anywhere (absolute path)
-cookstyle /path/to/cookbook --config /path/to/b-cookstyle-rules/.rubocop.yml
+| Rule | Cop Name | Description |
+|------|----------|-------------|
+| BARC016 | `Barclays::Barc016UseChefResources` | Use Chef resources, not shell commands |
+| BARC017 | `Barclays::Barc017NoSystemServices` | Protected system services |
+| BARC018 | `Barclays::Barc018ServiceReview` | Services not in whitelist need review |
+
+### Metadata Rules
+
+| Rule | Cop Name | Description |
+|------|----------|-------------|
+| BARC021 | `Barclays::Barc021ExactVersionDeps` | Exact version in depends |
+| BARC023 | `Barclays::Barc023SupportedPlatform` | Must specify supported platforms |
+| BARC024 | `Barclays::Barc024MaintainerInfo` | Valid maintainer/email/source_url |
+
+### Governance Rules (Middleware/Package Control)
+
+| Rule | Cop Name | Description |
+|------|----------|-------------|
+| BARC027 | `Barclays::Barc027MiddlewarePackages` | Only MW cookbooks deploy MW software |
+| BARC028 | `Barclays::Barc028RestrictedCookbookDeps` | Restricted cookbook dependencies |
+| BARC029 | `Barclays::Barc029CommunityCookbooks` | Community cookbook access control |
+| BARC030 | `Barclays::Barc030DeprecatedCookbooks` | No deprecated cookbook dependencies |
+| BARC031 | `Barclays::Barc031ControlledPackages` | Controlled package installation |
+| BARC032 | `Barclays::Barc032VersionFlags` | Minimum version requirements |
+| BARC033 | `Barclays::Barc033AllowedPins` | Soft-pin dependency requirements |
+| BARC034 | `Barclays::Barc034RestrictedAttrsRoles` | Restricted attributes in roles |
+| BARC035 | `Barclays::Barc035RestrictedAttributes` | Restricted attributes in recipes |
+| BARC036 | `Barclays::Barc036JavaVersionPin` | Java version pinning control |
+
+---
+
+## Enterprise Exception Mechanism
+
+The **key value** of BARC rules over built-in Cookstyle is the **bypass/whitelist mechanism** in `rules.rb`:
+
+### Exception Types
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `@etc_whitelist` | Allow specific cookbooks to modify /etc paths | `'/etc/sudoers.d/' => ['is_uisec_unix_sudo']` |
+| `@restricted_services` | Allow cookbooks to manage specific services | `'mysql' => []` (empty = all allowed) |
+| `@platform_cookbook_whitelist` | Platform cookbooks bypass most rules | `['b_unix_base_core', ...]` |
+| `@tag_whitelist` | Allow specific tags per cookbook | `'mycookbook' => ['mytag1']` |
+| `@mw_pkg_whitelist` | Allow MW package deployment | `['is_mw_tomcat_build', ...]` |
+| `@restricted_cookbook_whitelist` | Allow dependencies on restricted cookbooks | `'restricted_ckbk' => ['allowed1']` |
+| `@community_cookbook_whitelist` | Allow community cookbook access | `['wrapper_cookbook', ...]` |
+
+### Adding Exceptions
+
+Edit `rules.rb` and add your cookbook to the appropriate whitelist:
+
+```ruby
+# Example: Allow 'my_sudoers_cookbook' to modify /etc/sudoers.d/
+@etc_whitelist = {
+  '/etc/sudoers.d/' => ['is_uisec_unix_sudo', 'my_sudoers_cookbook'],  # Add your cookbook
+  # ...
+}
+
+# Example: Allow all cookbooks to manage 'myservice'
+@restricted_services = {
+  'mysql' => [],           # Empty array = all cookbooks allowed
+  'myservice' => [],       # Add new service
+  # ...
+}
 ```
 
-This loads:
-- ✅ All 200+ Cookstyle Chef best practices
-- ✅ All BARC001-BARC019 security rules
-- ✅ Exception handling from rules.rb
+**Always include a Change Request reference when modifying rules.rb.**
+
+---
 
 ## CI/CD Integration (Jenkins)
 
@@ -118,7 +194,10 @@ pipeline {
     stages {
         stage('Lint') {
             steps {
-                sh 'cookstyle cookbooks/${COOKBOOK} --config cookbooks/b-cookstyle-rules/.rubocop.yml --format json --out report.json'
+                sh '''
+                    cd cookbooks/b-cookstyle-rules && bundle install
+                    cookstyle --only Barclays cookbooks/${COOKBOOK} --format json --out report.json
+                '''
             }
         }
     }
@@ -132,35 +211,55 @@ pipeline {
 
 ---
 
-# Legacy Usage (Foodcritic - Deprecated)
+## Using in Your Cookbook
 
+```bash
+# From repository root
+cookstyle --only Barclays cookbooks/your-cookbook
 
-Once you've cloned the repo, you can run foodcritic using the following options to test your cookbooks against these rules:
+# With full Cookstyle + BARC rules
+cookstyle cookbooks/your-cookbook --config cookbooks/b-cookstyle-rules/.rubocop.yml
 
-````
+# Auto-fix (where possible)
+cookstyle --only Barclays -a cookbooks/your-cookbook
+```
+
+### Output Formats
+
+```bash
+# Progress (default)
+cookstyle --only Barclays cookbooks/your-cookbook
+
+# JSON for CI/CD
+cookstyle --only Barclays --format json --out report.json cookbooks/your-cookbook
+
+# HTML report
+cookstyle --only Barclays --format html --out report.html cookbooks/your-cookbook
+```
+
+---
+
+# ⚠️ Legacy Usage (Foodcritic - DEPRECATED)
+
+> **WARNING**: Foodcritic is no longer maintained. Use Cookstyle (above) instead.
+
+The legacy Foodcritic command (for reference only):
+
+```bash
 foodcritic -t barc -f security -I <path/to/rules.rb> cookbooks
-````
-You should make sure that *\<path/to/rules.rb\>* is replaced with the location of the rules.rb file in this repo.
+```
 
-# Regression testing for BARC foodcritic rules
+### Legacy Regression Testing
 
-There are three sets of rspec tests:
-1. Rules are checked with Rubocop using customized ````.rubocop_todo.yml```` file.
-2. Specially crafted cookbook ````b-foodcritic-violator```` with test cases breaking and passing all Barclays Foodcritic rules..
-3. Set of different cookbooks from production in repository ````b-foodcritic-regression```` with known failures.
-
-Both repositories are hosted in GitLab:
-* https://ldndsr000005612.intranet.barcapint.com/chef/b-foodcritic-violator/
-* https://ldndsr000005612.intranet.barcapint.com/chef/b-foodcritic-regression/tree/master/cookbooks
-
-Regression testing jobs are in Rakefile. Run with:
-````
-rake -v
-````
+Regression test repositories (GitLab):
+- https://ldndsr000005612.intranet.barcapint.com/chef/b-foodcritic-violator/
+- https://ldndsr000005612.intranet.barcapint.com/chef/b-foodcritic-regression/tree/master/cookbooks
 
 More @ https://confluence.barcapint.com/display/UNIX/Barclays+Foodcritic+Regression+checks
 
-# Rules
+---
+
+# Detailed Rule Documentation
 
 ## BARC001 - Do not manipulate users locally, use Active Directory instead
 

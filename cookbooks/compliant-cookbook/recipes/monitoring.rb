@@ -16,6 +16,16 @@ directory '/opt/myapp/logs' do
   owner 'root'
   group 'root'
   mode '0755'
+  recursive true
+  action :create
+end
+
+# Create scripts directory
+directory '/opt/myapp/scripts' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  recursive true
   action :create
 end
 
@@ -62,6 +72,11 @@ end
 # ============================================================
 # LOG AGGREGATION CONFIG (Compliant - allowed /etc path)
 # ============================================================
+
+# Define rsyslog service for notification
+service 'rsyslog' do
+  action :nothing
+end
 
 # /etc/rsyslog.d/ is whitelisted for log forwarding
 file '/etc/rsyslog.d/50-myapp.conf' do

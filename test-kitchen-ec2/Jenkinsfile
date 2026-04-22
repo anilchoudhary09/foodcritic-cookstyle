@@ -14,7 +14,7 @@ pipeline {
         EC2_HOST = credentials('ec2-kitchen-host')  // Secret text: EC2 hostname
         SSH_KEY = credentials('ec2-ssh-key')        // Secret file: SSH private key (.pem)
         SSH_USER = 'ec2-user'
-        
+
         // Remote paths on EC2
         REMOTE_WORKSPACE = '/home/ec2-user/kitchen-test'
     }
@@ -62,11 +62,11 @@ pipeline {
                     sh '''
                         echo "=== Testing SSH Connection to EC2 ==="
                         chmod 400 ${SSH_KEY}
-                        
+
                         ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
                             -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} \
                             "echo 'SSH Connection Successful' && uname -a"
-                        
+
                         echo ""
                         echo "=== Chef Workstation Version on EC2 ==="
                         ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} \
@@ -81,21 +81,54 @@ pipeline {
                 script {
                     sh '''
                         echo "=== Preparing Remote Workspace ==="
-                        
+
                         # Create remote workspace
                         ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} \
-                            "rm -rf ${REMOTE_WORKSPACE} && mkdir -p ${REMOTE_WORKSPACE}"
+                            "rm -rf ${REMOTE_WORKSPACE} && mkdir -p ${REMOTE_WORKSPACE}/.ssh"
+
+                        echo "=== Transferring SSH Key to EC2 ==="
                         
+                        # Transfer SSH key for kitchen to use
+                        scp -i ${SSH_KEY} ${SSH_KEY} \
+                            ${SSH_USER}@${EC2_HOST}:${REMOTE_WORKSPACE}/.ssh/kitchen-key.pem
+                        
+                        # Set correct permissions on the key
+                        ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} \
+                            "chmod 400 ${REMOTE_WORKSPACE}/.ssh/kitchen-key.pem"
+
                         echo "=== Transferring Cookbooks to EC2 ==="
-                        
+
                         # Transfer cookbooks
                         scp -i ${SSH_KEY} -r ${WORKSPACE}/cookbooks \
                             ${SSH_USER}@${EC2_HOST}:${REMOTE_WORKSPACE}/
-                        
+
                         # Transfer test-kitchen-ec2 config
                         scp -i ${SSH_KEY} -r ${WORKSPACE}/test-kitchen-ec2 \
                             ${SSH_USER}@${EC2_HOST}:${REMOTE_WORKSPACE}/
                         
+                        echo "=== Creating kitchen.local.yml with correct SSH key path ==="
+                        
+                        # Create kitchen.local.yml with EC2-specific paths
+                        ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} "
+                            cat > ${REMOTE_WORKSPACE}/test-kitchen-ec2/kitchen.local.yml << 'KITCHENEOF'
+---
+transport:
+  ssh_key: ${REMOTE_WORKSPACE}/.ssh/kitchen-key.pem
+  
+driver:
+  host: localhost
+
+platforms:
+  - name: amazon-linux-2023
+    driver:
+      host: localhost
+    transport:
+      hostname: localhost
+KITCHENEOF
+                            echo 'kitchen.local.yml created:'
+                            cat ${REMOTE_WORKSPACE}/test-kitchen-ec2/kitchen.local.yml
+                        "
+
                         echo ""
                         echo "=== Remote Workspace Contents ==="
                         ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} \
@@ -113,28 +146,28 @@ pipeline {
                 script {
                     def cookbook = params.COOKBOOK_TO_TEST
                     echo "Running Cookstyle with BARC rules on ${cookbook}"
-                    
+
                     sh """
                         echo "=== Cookstyle BARC Rules Validation ==="
                         echo "Cookbook: ${cookbook}"
                         echo ""
-                        
+
                         ssh -i \${SSH_KEY} \${SSH_USER}@\${EC2_HOST} '
                             cd ${REMOTE_WORKSPACE}
-                            
+
                             echo "Running cookstyle on ${cookbook}..."
                             cookstyle cookbooks/${cookbook} \
                                 --config cookbooks/b-cookstyle-rules/.rubocop.yml \
                                 --format progress \
                                 --format json --out cookstyle-report.json || true
-                            
+
                             echo ""
                             echo "=== Cookstyle Summary ==="
                             cookstyle cookbooks/${cookbook} \
                                 --config cookbooks/b-cookstyle-rules/.rubocop.yml \
                                 --format simple || true
                         '
-                        
+
                         # Download report
                         scp -i \${SSH_KEY} \${SSH_USER}@\${EC2_HOST}:${REMOTE_WORKSPACE}/cookstyle-report.json \
                             \${WORKSPACE}/ || true
@@ -152,14 +185,14 @@ pipeline {
             steps {
                 sh '''
                     echo "=== Resolving Cookbook Dependencies ==="
-                    
+
                     ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} "
                         cd ${REMOTE_WORKSPACE}/test-kitchen-ec2
-                        
+
                         echo 'Running berks vendor...'
                         rm -rf cookbooks
                         berks vendor cookbooks
-                        
+
                         echo ''
                         echo '=== Vendored Cookbooks ==='
                         ls -la cookbooks/
@@ -172,7 +205,7 @@ pipeline {
             steps {
                 sh '''
                     echo "=== Available Kitchen Instances ==="
-                    
+
                     ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} "
                         cd ${REMOTE_WORKSPACE}/test-kitchen-ec2
                         kitchen list
@@ -187,26 +220,26 @@ pipeline {
                     def suite = params.SUITE
                     def action = params.ACTION
                     def instance = suite == 'all' ? '' : "${suite}-amazon-linux-2023"
-                    
+
                     echo "Running kitchen ${action} on ${suite == 'all' ? 'all instances' : instance}"
-                    
+
                     sh """
                         echo "=============================================="
                         echo "  Test Kitchen ${action.toUpperCase()}"
                         echo "  Instance: ${instance ?: 'ALL'}"
                         echo "=============================================="
                         echo ""
-                        
+
                         ssh -i \${SSH_KEY} \${SSH_USER}@\${EC2_HOST} '
                             cd ${REMOTE_WORKSPACE}/test-kitchen-ec2
-                            
+
                             # Set environment for kitchen
                             export CHEF_LICENSE=accept-silent
-                            
+
                             # Run kitchen action
                             kitchen ${action} ${instance}
                         '
-                        
+
                         echo ""
                         echo "=============================================="
                         echo "  Kitchen ${action.toUpperCase()} Complete!"
@@ -220,7 +253,7 @@ pipeline {
             steps {
                 sh '''
                     echo "=== Final Kitchen Status ==="
-                    
+
                     ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} "
                         cd ${REMOTE_WORKSPACE}/test-kitchen-ec2
                         kitchen list
@@ -233,14 +266,14 @@ pipeline {
             steps {
                 sh '''
                     echo "=== Collecting Kitchen Logs ==="
-                    
+
                     mkdir -p ${WORKSPACE}/kitchen-logs
-                    
+
                     # Download logs from EC2
                     scp -i ${SSH_KEY} -r \
                         ${SSH_USER}@${EC2_HOST}:${REMOTE_WORKSPACE}/test-kitchen-ec2/.kitchen/logs/* \
                         ${WORKSPACE}/kitchen-logs/ || true
-                    
+
                     ls -la ${WORKSPACE}/kitchen-logs/ || true
                 '''
             }
@@ -251,7 +284,7 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'kitchen-logs/**', allowEmptyArchive: true
         }
-        
+
         success {
             echo '''
 ╔══════════════════════════════════════════════════════════════╗
@@ -261,7 +294,7 @@ pipeline {
 ╚══════════════════════════════════════════════════════════════╝
 '''
         }
-        
+
         failure {
             echo '''
 ╔══════════════════════════════════════════════════════════════╗
@@ -271,14 +304,14 @@ pipeline {
 ╚══════════════════════════════════════════════════════════════╝
 '''
         }
-        
+
         cleanup {
             // Optionally cleanup remote workspace
             sh '''
                 echo "Cleanup: Keeping remote workspace for debugging"
                 # Uncomment to clean up:
                 # ssh -i ${SSH_KEY} ${SSH_USER}@${EC2_HOST} "rm -rf ${REMOTE_WORKSPACE}" || true
-            ''' 
+            '''
         }
     }
 }
